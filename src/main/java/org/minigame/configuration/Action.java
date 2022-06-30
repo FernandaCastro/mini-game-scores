@@ -1,4 +1,4 @@
-package org.minigame;
+package org.minigame.configuration;
 
 public class Action {
 

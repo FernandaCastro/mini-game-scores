@@ -3,10 +3,11 @@ package org.minigame;
 import com.sun.net.httpserver.HttpExchange;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.minigame.user.UserController;
+import org.minigame.configuration.HttpDispatcherHandler;
+import org.minigame.configuration.RootContext;
+import org.minigame.session.SessionController;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
@@ -22,7 +23,7 @@ public class HttpDispatcherHandlerTest {
     RootContext rootContext;
 
     @Mock
-    UserController userController;
+    SessionController sessionController;
 
     @Mock
     HttpExchange exchange;
@@ -34,11 +35,12 @@ public class HttpDispatcherHandlerTest {
     public void givenGETLogin_whenHandle_shouldRouteToUserController() throws IOException, URISyntaxException {
         when(exchange.getRequestURI()).thenReturn(new URI("http://localhost:8081/4711/login"));
         when(exchange.getRequestMethod()).thenReturn("GET");
-        when(rootContext.getBean(UserController.class)).thenReturn(userController);
+        when(rootContext.getBean(SessionController.class)).thenReturn(sessionController);
 
         httpDispatcherHandler.handle(exchange);
 
-        verify(userController, times(1)).execute("GET/login", exchange);
-
+        verify(sessionController, times(1)).execute("GET/login", exchange);
     }
+
+    //TODO: Write negative tests
 }

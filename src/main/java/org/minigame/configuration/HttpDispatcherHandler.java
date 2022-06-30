@@ -1,9 +1,9 @@
-package org.minigame;
+package org.minigame.configuration;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import org.minigame.level.LevelController;
-import org.minigame.user.UserController;
+import org.minigame.session.SessionController;
 
 import java.io.IOException;
 import java.net.URI;
@@ -74,7 +74,7 @@ public class HttpDispatcherHandler implements HttpHandler {
         }catch(Exception e){
             e.printStackTrace();
             String error = HttpStatus.INTERNAL_SERVER_ERROR.getMessage() + ": " + e.getMessage();
-            httpHelper.sendResponse(HttpStatus.INTERNAL_SERVER_ERROR, error.toString(), exchange);
+            httpHelper.sendResponse(HttpStatus.INTERNAL_SERVER_ERROR, error, exchange);
         }
     }
 
@@ -83,7 +83,7 @@ public class HttpDispatcherHandler implements HttpHandler {
 
         switch (action) {
             case Action.GET_LOGIN:
-                return (UserController) rootContext.getBean(UserController.class);
+                return (SessionController) rootContext.getBean(SessionController.class);
             case Action.POST_SCORE:
             case Action.GET_HIGH_SCORE_LIST:
                 return (LevelController) rootContext.getBean(LevelController.class);

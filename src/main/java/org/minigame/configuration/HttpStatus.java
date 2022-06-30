@@ -1,4 +1,4 @@
-package org.minigame;
+package org.minigame.configuration;
 
 public enum HttpStatus {
     OK(200, "OK"),

@@ -1,10 +1,10 @@
 package org.minigame.level;
 
 import com.sun.net.httpserver.HttpExchange;
-import org.minigame.Action;
-import org.minigame.Controller;
-import org.minigame.HttpHelper;
-import org.minigame.HttpStatus;
+import org.minigame.configuration.Action;
+import org.minigame.configuration.Controller;
+import org.minigame.configuration.HttpHelper;
+import org.minigame.configuration.HttpStatus;
 
 import java.io.IOException;
 
