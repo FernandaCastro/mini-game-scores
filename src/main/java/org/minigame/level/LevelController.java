@@ -1,7 +1,7 @@
 package org.minigame.level;
 
 import com.sun.net.httpserver.HttpExchange;
-import org.minigame.configuration.Action;
+import org.minigame.configuration.Actions;
 import org.minigame.configuration.Controller;
 import org.minigame.configuration.HttpHelper;
 import org.minigame.configuration.HttpStatus;
@@ -36,8 +36,8 @@ public class LevelController implements Controller {
         int levelId = Integer.parseInt(pathVar);
 
         switch (action) {
-            case Action.POST_SCORE -> getScore(levelId, exchange);
-            case Action.GET_HIGH_SCORE_LIST -> getHighScoreList(levelId, exchange);
+            case Actions.POST_SCORE -> getScore(levelId, exchange);
+            case Actions.GET_HIGH_SCORE_LIST -> getHighScoreList(levelId, exchange);
         }
     }
 }

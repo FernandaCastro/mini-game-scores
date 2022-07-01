@@ -1,10 +1,8 @@
-package org.minigame;
+package org.minigame.configuration;
 
 import com.sun.net.httpserver.HttpExchange;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.minigame.configuration.HttpDispatcherHandler;
-import org.minigame.configuration.RootContext;
 import org.minigame.session.SessionController;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -35,7 +33,7 @@ public class HttpDispatcherHandlerTest {
     public void givenGETLogin_whenHandle_shouldRouteToUserController() throws IOException, URISyntaxException {
         when(exchange.getRequestURI()).thenReturn(new URI("http://localhost:8081/4711/login"));
         when(exchange.getRequestMethod()).thenReturn("GET");
-        when(rootContext.getBean(SessionController.class)).thenReturn(sessionController);
+        when(rootContext.get(SessionController.class)).thenReturn(sessionController);
 
         httpDispatcherHandler.handle(exchange);
 

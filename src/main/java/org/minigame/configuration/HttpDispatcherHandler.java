@@ -45,9 +45,9 @@ public class HttpDispatcherHandler implements HttpHandler {
     }
 
     public static final Set<String> context = Set.of(
-            Action.GET_LOGIN,
-            Action.POST_SCORE,
-            Action.GET_HIGH_SCORE_LIST
+            Actions.GET_LOGIN,
+            Actions.POST_SCORE,
+            Actions.GET_HIGH_SCORE_LIST
     );
 
     @Override
@@ -82,11 +82,11 @@ public class HttpDispatcherHandler implements HttpHandler {
     private Controller getController(String action, HttpExchange exchange) throws IOException{
 
         switch (action) {
-            case Action.GET_LOGIN:
-                return (SessionController) rootContext.getBean(SessionController.class);
-            case Action.POST_SCORE:
-            case Action.GET_HIGH_SCORE_LIST:
-                return (LevelController) rootContext.getBean(LevelController.class);
+            case Actions.GET_LOGIN:
+                return (SessionController) rootContext.get(SessionController.class);
+            case Actions.POST_SCORE:
+            case Actions.GET_HIGH_SCORE_LIST:
+                return (LevelController) rootContext.get(LevelController.class);
             default:
                 httpHelper.sendResponse(HttpStatus.NOT_FOUND, HttpStatus.NOT_FOUND.getMessage(), exchange);
                 break;

@@ -1,7 +1,6 @@
 package org.minigame.session;
 
 import com.sun.net.httpserver.HttpExchange;
-import org.minigame.configuration.Action;
 import org.minigame.configuration.Controller;
 import org.minigame.configuration.HttpHelper;
 import org.minigame.configuration.HttpStatus;

@@ -11,7 +11,6 @@ import java.util.regex.Pattern;
 
 public class HttpHelper {
 
-    //static final String REGEX_URI = "([http?://]+[-a-zA-Z|.|:|0-9]+)/([0-9]+)/([a-zA-Z]+)";
     static final String REGEX_URI = "/([0-9]+)/([a-zA-Z]+)";
     static final Pattern PATTERN_URI = Pattern.compile(REGEX_URI);
 

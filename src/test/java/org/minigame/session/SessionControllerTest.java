@@ -1,15 +1,12 @@
-package org.minigame;
+package org.minigame.session;
 
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.minigame.configuration.Action;
+import org.minigame.configuration.Actions;
 import org.minigame.configuration.HttpHelper;
 import org.minigame.configuration.HttpStatus;
-import org.minigame.session.Session;
-import org.minigame.session.SessionController;
-import org.minigame.session.SessionService;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
@@ -51,7 +48,7 @@ public class SessionControllerTest {
         when(exchange.getResponseBody()).thenReturn(responseBody);
 
         //when
-        sessionController.execute(Action.GET_LOGIN, exchange);
+        sessionController.execute(Actions.GET_LOGIN, exchange);
 
         //then
         assertEquals(HttpStatus.BAD_REQUEST.getMessage(), responseBody.toString());
@@ -71,7 +68,7 @@ public class SessionControllerTest {
         when(sessionService.registerSession(anyInt())).thenReturn(session);
 
         //when
-        sessionController.execute(Action.GET_LOGIN, exchange);
+        sessionController.execute(Actions.GET_LOGIN, exchange);
 
         //then
         verify(sessionService, times(1)).registerSession(4711);

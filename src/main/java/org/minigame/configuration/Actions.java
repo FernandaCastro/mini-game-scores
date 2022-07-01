@@ -1,6 +1,6 @@
 package org.minigame.configuration;
 
-public class Action {
+public class Actions {
 
         public static final String GET_LOGIN = "GET/login";
         public static final String POST_SCORE = "POST/score";
