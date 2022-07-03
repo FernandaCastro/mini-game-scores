@@ -1,7 +1,11 @@
+package org.minigame;
+
 import org.minigame.configuration.HttpHelper;
 import org.minigame.configuration.MiniGameHttpServer;
 import org.minigame.configuration.RootContext;
-import org.minigame.level.LevelController;
+import org.minigame.score.ScoreController;
+import org.minigame.score.ScoreRepository;
+import org.minigame.score.ScoreService;
 import org.minigame.session.SessionController;
 import org.minigame.session.SessionRepository;
 import org.minigame.session.SessionService;
@@ -25,7 +29,9 @@ public class MiniGameScoresApplication {
         rootContext.add(new SessionRepository());
         rootContext.add(new SessionService((SessionRepository)rootContext.get(SessionRepository.class), rootContext.getClock()));
         rootContext.add(new SessionController((HttpHelper)rootContext.get(HttpHelper.class), (SessionService) rootContext.get(SessionService.class)));
-        rootContext.add(new LevelController((HttpHelper)rootContext.get(HttpHelper.class)));
+        rootContext.add(new ScoreRepository());
+        rootContext.add(new ScoreService((ScoreRepository)rootContext.get(ScoreRepository.class)));
+        rootContext.add(new ScoreController((HttpHelper)rootContext.get(HttpHelper.class), (SessionService)rootContext.get(SessionService.class), (ScoreService)rootContext.get(ScoreService.class)));
 
         new MiniGameHttpServer(rootContext).start(port, threadPool);
     }

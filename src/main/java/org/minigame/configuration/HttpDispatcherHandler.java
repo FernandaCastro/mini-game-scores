@@ -2,10 +2,9 @@ package org.minigame.configuration;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import org.minigame.level.LevelController;
+import org.minigame.score.ScoreController;
 import org.minigame.session.SessionController;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -44,53 +43,52 @@ public class HttpDispatcherHandler implements HttpHandler {
         this.httpHelper = httpHelper;
     }
 
-    public static final Set<String> context = Set.of(
+    public static final Set<String> httpContext = Set.of(
             Actions.GET_LOGIN,
             Actions.POST_SCORE,
             Actions.GET_HIGH_SCORE_LIST
     );
 
     @Override
-    public void handle(HttpExchange exchange) throws IOException {
+    public void handle(HttpExchange exchange) {
         try {
             URI uri = exchange.getRequestURI();
-            Matcher matcher = HttpHelper.PATTERN_URI.matcher(uri.getPath());
+            Matcher matcher = httpHelper.PATTERN_URI.matcher(uri.getPath());
             if (!matcher.matches()) {
-                httpHelper.sendResponse(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST.getMessage(), exchange);
-                return;
+                throw new MiniGameException(HttpStatus.BAD_REQUEST, "URI requested is invalid" );
             }
 
             String actionKey = exchange.getRequestMethod() + "/" + matcher.group(2);
-            if(!context.contains(actionKey)){
-                httpHelper.sendResponse(HttpStatus.NOT_FOUND, HttpStatus.NOT_FOUND.getMessage(), exchange);
+            if (!httpContext.contains(actionKey)) {
+                httpHelper.sendResponse(HttpStatus.BAD_REQUEST, "PathParam and/or Action are invalid", exchange);
                 return;
             }
 
             Controller controller = getController(actionKey, exchange);
-            if(controller!=null) {
+            if (controller != null) {
                 controller.execute(actionKey, exchange);
             }
 
+        }catch(MiniGameException e){
+            httpHelper.sendResponse(e.getHttpStatus(), e.getMessage(), exchange);
+
         }catch(Exception e){
-            e.printStackTrace();
             String error = HttpStatus.INTERNAL_SERVER_ERROR.getMessage() + ": " + e.getMessage();
             httpHelper.sendResponse(HttpStatus.INTERNAL_SERVER_ERROR, error, exchange);
         }
     }
 
 
-    private Controller getController(String action, HttpExchange exchange) throws IOException{
+    private Controller getController(String action, HttpExchange exchange){
 
         switch (action) {
             case Actions.GET_LOGIN:
                 return (SessionController) rootContext.get(SessionController.class);
             case Actions.POST_SCORE:
             case Actions.GET_HIGH_SCORE_LIST:
-                return (LevelController) rootContext.get(LevelController.class);
+                return (ScoreController) rootContext.get(ScoreController.class);
             default:
-                httpHelper.sendResponse(HttpStatus.NOT_FOUND, HttpStatus.NOT_FOUND.getMessage(), exchange);
-                break;
+                throw new MiniGameException(HttpStatus.NOT_FOUND, "Action not found");
         }
-        return null;
     }
 }

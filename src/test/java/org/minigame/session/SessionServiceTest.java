@@ -55,7 +55,7 @@ public class SessionServiceTest {
     }
 
     @Test
-    public void givenUserIdInvalidExistingSession_whenRegisterSession_shouldReturnExistingSessionTest(){
+    public void givenExpiredSession_whenRegisterSession_shouldReturnExistingSessionTest(){
         //given
         long createdAt = Instant.now().minus(15, ChronoUnit.MINUTES).toEpochMilli();
         var existingSession = new Session(4711, createdAt);

@@ -4,8 +4,7 @@ import com.sun.net.httpserver.HttpExchange;
 import org.minigame.configuration.Controller;
 import org.minigame.configuration.HttpHelper;
 import org.minigame.configuration.HttpStatus;
-
-import java.io.IOException;
+import org.minigame.configuration.MiniGameException;
 
 public class SessionController implements Controller {
 
@@ -17,31 +16,40 @@ public class SessionController implements Controller {
         this.sessionService = sessionService;
     }
 
-    //Request: GET /<userid>/login
-    //Response: <sessionkey>
-    //<userid> : 31 bit unsigned integer number
-    //<sessionkey> : A string representing a session (valid for 10 minutes).
-    //Example: http://localhost:8081/4711/login --> UICSNDK
-    protected void login(int userId, HttpExchange exchange) throws IOException {
+    protected void login(int userId, HttpExchange exchange) {
+
         try {
+
             Session session = sessionService.registerSession(userId);
             httpHelper.sendResponse(HttpStatus.OK, session.getSessionKey(), exchange);
 
-        //TODO: Treat Exception
-        }catch(Exception e){
-            httpHelper.sendResponse(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), exchange);
+        }catch(MiniGameException e){
+            httpHelper.sendResponse(e.getHttpStatus(), e.getMessage(), exchange);
         }
     }
 
     @Override
-    public void execute(String action, HttpExchange exchange) throws IOException {
+    public void execute(String action, HttpExchange exchange) {
+
+        try{
+            int userId = getUserId(exchange);
+            login(userId, exchange);
+
+        }catch(MiniGameException e){
+            httpHelper.sendResponse(e.getHttpStatus(), e.getMessage(), exchange);
+        }
+    }
+
+    private int getUserId(HttpExchange exchange){
         String pathVar = httpHelper.getPathVariable(exchange);
         if (pathVar==null) {
-            httpHelper.sendResponse(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST.getMessage(), exchange);
-            return;
+            throw new MiniGameException(HttpStatus.BAD_REQUEST, "<UserId> is missing");
         }
-        int userId = Integer.parseInt(pathVar);
 
-        login(userId, exchange);
+        try {
+            return Integer.parseInt(pathVar);
+        }catch (NumberFormatException e) {
+            throw new MiniGameException(HttpStatus.BAD_REQUEST, "<UserId> is invalid");
+        }
     }
 }

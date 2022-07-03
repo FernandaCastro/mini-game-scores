@@ -7,9 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.minigame.configuration.Actions;
 import org.minigame.configuration.HttpHelper;
 import org.minigame.configuration.HttpStatus;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Spy;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.ByteArrayOutputStream;
@@ -34,16 +32,20 @@ public class SessionControllerTest {
     @Spy
     HttpHelper httpHelper;
 
+    @Captor
+    ArgumentCaptor<Integer> httpStatusCodeCaptor;
+
+
     @InjectMocks
     SessionController sessionController;
 
     @Test
-    public void givenBadURI_whenExecute_shouldReturnBadRequest() throws IOException, URISyntaxException {
+    public void givenBadURI_whenExecuteLogin_shouldReturnBadRequest() throws IOException, URISyntaxException {
         //given
         Headers headers = new Headers();
         OutputStream responseBody = new ByteArrayOutputStream();
 
-        when(exchange.getRequestURI()).thenReturn(new URI("http://localhost:8081//login"));
+        when(exchange.getRequestURI()).thenReturn(new URI("//login"));
         when(exchange.getResponseHeaders()).thenReturn(headers);
         when(exchange.getResponseBody()).thenReturn(responseBody);
 
@@ -51,18 +53,21 @@ public class SessionControllerTest {
         sessionController.execute(Actions.GET_LOGIN, exchange);
 
         //then
-        assertEquals(HttpStatus.BAD_REQUEST.getMessage(), responseBody.toString());
+        Mockito.verify(exchange).sendResponseHeaders(httpStatusCodeCaptor.capture(), anyLong());
+        int httpStatusCode = httpStatusCodeCaptor.getValue();
+
+        assertEquals(HttpStatus.BAD_REQUEST.getStatusCode(), httpStatusCode);
         responseBody.close();
     }
 
     @Test
-    public void givenGoodURI_whenExecute_shouldRegisterSession() throws URISyntaxException, IOException {
+    public void givenGoodURI_whenExecuteLogin_shouldRegisterSession() throws URISyntaxException, IOException {
         //given
         Session session = new Session(4711, Clock.systemUTC().millis());
         Headers headers = new Headers();
         OutputStream responseBody = new ByteArrayOutputStream();
 
-        when(exchange.getRequestURI()).thenReturn(new URI("http://localhost:8081/4711/login"));
+        when(exchange.getRequestURI()).thenReturn(new URI("/4711/login"));
         when(exchange.getResponseHeaders()).thenReturn(headers);
         when(exchange.getResponseBody()).thenReturn(responseBody);
         when(sessionService.registerSession(anyInt())).thenReturn(session);
@@ -72,6 +77,11 @@ public class SessionControllerTest {
 
         //then
         verify(sessionService, times(1)).registerSession(4711);
+
+        Mockito.verify(exchange).sendResponseHeaders(httpStatusCodeCaptor.capture(), anyLong());
+        int httpStatusCode = httpStatusCodeCaptor.getValue();
+
+        assertEquals(HttpStatus.OK.getStatusCode(), httpStatusCode);
         assertEquals(session.getSessionKey(), responseBody.toString());
     }
 }
