@@ -49,7 +49,7 @@ public class HttpHelper {
 
         }catch (IOException e){
             //TODO: Unable to send response anyway, just log the error
-            e.printStackTrace();
+            throw new IllegalStateException("Unexpected state", e);
         }
     }
 

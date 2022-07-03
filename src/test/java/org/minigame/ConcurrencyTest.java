@@ -17,12 +17,16 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ConcurrencyTest {
+
+    private static Logger log = Logger.getLogger(ConcurrencyTest.class.getName());
 
     @BeforeAll
     static void init(){
@@ -38,12 +42,14 @@ public class ConcurrencyTest {
     @Test
     public void concurrencyTest() throws InterruptedException {
 
+        log.setLevel(Level.ALL);
         HttpClient client = HttpClient.newBuilder().build();
         BlockingQueue<String> sessionKeyQueue = new LinkedBlockingQueue<>();
+        //<String> sessionKeyQueue = new LinkedBlockingQueue<>();
         List<String> errors = Collections.synchronizedList(new ArrayList<>());
 
-        int nLoginWorkers = 210;
-        int nScoreWorkers = 200;
+        int nLoginWorkers = 250;
+        int nScoreWorkers = 250;
         int nRankingWorker = 100;
 
         CountDownLatch allDoneSignal = new CountDownLatch(nLoginWorkers + nScoreWorkers + nRankingWorker);
@@ -135,10 +141,8 @@ public class ConcurrencyTest {
                     errors.add(response.statusCode() + ": Login : " + response.body());
                 }
 
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            } catch (IOException | InterruptedException e) {
+                log.log(Level.WARNING, "LoginWorker: {} : {}", List.of(e.getClass().getName(), e.getMessage()));
             }
 
             loginSignal.countDown();
@@ -180,10 +184,8 @@ public class ConcurrencyTest {
                     errors.add(response.statusCode() + ": Score" + response.body());
                 }
 
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (IOException ioException) {
-                ioException.printStackTrace();
+            } catch (InterruptedException | IOException e) {
+                log.log(Level.WARNING, "LoginWorker: {} : {}", List.of(e.getClass().getName(), e.getMessage()));
             }
 
             scoreSignal.countDown();
@@ -220,12 +222,8 @@ public class ConcurrencyTest {
                     errors.add(response.statusCode() + ": HighScores" + response.body());
                 }
 
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (BrokenBarrierException e) {
-                e.printStackTrace();
-            } catch (IOException ioException) {
-                ioException.printStackTrace();
+            } catch (InterruptedException | BrokenBarrierException | IOException e) {
+                log.log(Level.WARNING, "LoginWorker: {} : {}", List.of(e.getClass().getName(), e.getMessage()));
             }
 
             doneSignal.countDown();

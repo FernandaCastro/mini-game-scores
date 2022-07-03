@@ -7,6 +7,8 @@ import org.minigame.session.SessionController;
 
 import java.net.URI;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 
 //Contexts
@@ -34,6 +36,8 @@ import java.util.regex.Matcher;
 
 
 public class HttpDispatcherHandler implements HttpHandler {
+
+    private static Logger log = Logger.getLogger(HttpDispatcherHandler.class.getName());
 
     private final RootContext rootContext;
     private final HttpHelper httpHelper;
@@ -69,10 +73,13 @@ public class HttpDispatcherHandler implements HttpHandler {
                 controller.execute(actionKey, exchange);
             }
 
-        }catch(MiniGameException e){
+        } catch (MiniGameException e) {
             httpHelper.sendResponse(e.getHttpStatus(), e.getMessage(), exchange);
 
-        }catch(Exception e){
+        } catch (IllegalStateException e) {
+            log.log(Level.SEVERE, e.getMessage());
+
+        } catch (RuntimeException e){
             String error = HttpStatus.INTERNAL_SERVER_ERROR.getMessage() + ": " + e.getMessage();
             httpHelper.sendResponse(HttpStatus.INTERNAL_SERVER_ERROR, error, exchange);
         }
