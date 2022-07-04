@@ -15,6 +15,7 @@ import java.time.Clock;
 public class MiniGameScoresApplication {
 
     public static void main(String[] args) {
+
         int port = 8081;
         int threadPool = 10;
         if (args != null && args.length > 0) {

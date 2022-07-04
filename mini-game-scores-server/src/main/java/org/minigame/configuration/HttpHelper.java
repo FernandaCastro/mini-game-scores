@@ -7,11 +7,16 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class HttpHelper {
+
+    private static Logger log = Logger.getLogger(HttpHelper.class.getName());
 
     private final String REGEX_URI = "/([0-9]+)/([a-zA-Z]+)";
     public Pattern PATTERN_URI = Pattern.compile(REGEX_URI);
@@ -44,7 +49,7 @@ public class HttpHelper {
             OutputStream responseBody = exchange.getResponseBody();
             responseBody.write(response.getBytes());
 
-            //System.out.println(httpStatus.getStatusCode() + ":" + response);
+            log.log(Level.INFO, "HTTP Status Code: {0} - Response: {1}", List.of(httpStatus.getStatusCode(), response).toArray());
             exchange.close();
 
         }catch (IOException e){
