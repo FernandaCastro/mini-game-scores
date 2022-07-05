@@ -6,6 +6,7 @@ import org.minigame.score.ScoreController;
 import org.minigame.session.SessionController;
 
 import java.net.URI;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -64,13 +65,16 @@ public class HttpDispatcherHandler implements HttpHandler {
 
             String actionKey = exchange.getRequestMethod() + "/" + matcher.group(2);
             if (!httpContext.contains(actionKey)) {
-                httpHelper.sendResponse(HttpStatus.BAD_REQUEST, "PathParam and/or Action are invalid", exchange);
-                return;
+                throw new MiniGameException(HttpStatus.BAD_REQUEST, "PathParam and/or Action are invalid");
             }
+
+            String body = httpHelper.readRequestBody(exchange);
+            String pathVar = httpHelper.getPathVariable(exchange);
+            Map<String, String> queryParam = httpHelper.getQueryParam(exchange);
 
             Controller controller = getController(actionKey, exchange);
             if (controller != null) {
-                controller.execute(actionKey, exchange);
+                controller.execute(actionKey, exchange, body, pathVar, queryParam);
             }
 
         } catch (MiniGameException e) {
@@ -85,7 +89,6 @@ public class HttpDispatcherHandler implements HttpHandler {
         }
     }
 
-
     private Controller getController(String action, HttpExchange exchange){
 
         switch (action) {
@@ -98,4 +101,5 @@ public class HttpDispatcherHandler implements HttpHandler {
                 throw new MiniGameException(HttpStatus.NOT_FOUND, "Action not found");
         }
     }
+
 }

@@ -13,9 +13,10 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.*;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Clock;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -46,13 +47,12 @@ public class ScoreControllerTest {
     public void givenGoodLevelIdAndScore_whenExecuteRegisterScore_shouldReturnOK() throws URISyntaxException, IOException {
 
         //given
-        InputStream requestBody = new ByteArrayInputStream("1000".getBytes());
         Headers headers = new Headers();
         OutputStream responseBody = new ByteArrayOutputStream();
         Session session = new Session (1234, Clock.systemUTC().millis());
+        Map<String, String> queryParam = new HashMap<>();
+        queryParam.put("sessionkey", "UICSNDK");
 
-        when(exchange.getRequestURI()).thenReturn(new URI("/2/score?sessionkey=UICSNDK"));
-        when(exchange.getRequestBody()).thenReturn(requestBody);
         when(exchange.getResponseHeaders()).thenReturn(headers);
         when(exchange.getResponseBody()).thenReturn(responseBody);
         when(sessionService.isValid("UICSNDK")).thenReturn(true);
@@ -60,7 +60,7 @@ public class ScoreControllerTest {
         doNothing().when(scoreService).save(any(Score.class));
 
         //when
-        scoreController.execute(Actions.POST_SCORE, exchange);
+        scoreController.execute(Actions.POST_SCORE, exchange, "1000", "2", queryParam);
 
         //then
         verify(scoreService, times(1)).save(any(Score.class));
@@ -78,13 +78,14 @@ public class ScoreControllerTest {
         //given
         Headers headers = new Headers();
         OutputStream responseBody = new ByteArrayOutputStream();
+        Map<String, String> queryParam = new HashMap<>();
+        queryParam.put("sessionkey", "UICSNDK");
 
-        when(exchange.getRequestURI()).thenReturn(new URI("//score?sessionkey=UICSNDK"));
         when(exchange.getResponseHeaders()).thenReturn(headers);
         when(exchange.getResponseBody()).thenReturn(responseBody);
 
         //when
-        scoreController.execute(Actions.POST_SCORE, exchange);
+        scoreController.execute(Actions.POST_SCORE, exchange, "1000", null, queryParam);
 
         //then
         Mockito.verify(exchange).sendResponseHeaders(httpStatusCodeCaptor.capture(), anyLong());
@@ -97,17 +98,16 @@ public class ScoreControllerTest {
     public void givenMissingScore_whenExecuteRegisterScore_shouldReturnBadRequest() throws URISyntaxException, IOException {
 
         //given
-        InputStream requestBody = new ByteArrayInputStream("".getBytes());
         Headers headers = new Headers();
         OutputStream responseBody = new ByteArrayOutputStream();
+        Map<String, String> queryParam = new HashMap<>();
+        queryParam.put("sessionkey", "UICSNDK");
 
-        when(exchange.getRequestURI()).thenReturn(new URI("/2/score?sessionkey=UICSNDK"));
-        when(exchange.getRequestBody()).thenReturn(requestBody);
         when(exchange.getResponseHeaders()).thenReturn(headers);
         when(exchange.getResponseBody()).thenReturn(responseBody);
 
         //when
-        scoreController.execute(Actions.POST_SCORE, exchange);
+        scoreController.execute(Actions.POST_SCORE, exchange, "", "2", queryParam);
 
         //then
         Mockito.verify(exchange).sendResponseHeaders(httpStatusCodeCaptor.capture(), anyLong());
@@ -120,17 +120,16 @@ public class ScoreControllerTest {
     public void givenBadScore_whenExecuteRegisterScore_shouldReturnBadRequest() throws URISyntaxException, IOException {
 
         //given
-        InputStream requestBody = new ByteArrayInputStream("ABCD".getBytes());
         Headers headers = new Headers();
         OutputStream responseBody = new ByteArrayOutputStream();
+        Map<String, String> queryParam = new HashMap<>();
+        queryParam.put("sessionkey", "UICSNDK");
 
-        when(exchange.getRequestURI()).thenReturn(new URI("/2/score?sessionkey=UICSNDK"));
-        when(exchange.getRequestBody()).thenReturn(requestBody);
         when(exchange.getResponseHeaders()).thenReturn(headers);
         when(exchange.getResponseBody()).thenReturn(responseBody);
 
         //when
-        scoreController.execute(Actions.POST_SCORE, exchange);
+        scoreController.execute(Actions.POST_SCORE, exchange, "ABCD", "2", queryParam);
 
         //then
         Mockito.verify(exchange).sendResponseHeaders(httpStatusCodeCaptor.capture(), anyLong());
@@ -143,17 +142,16 @@ public class ScoreControllerTest {
     public void givenBadQueryParam_whenExecuteRegisterScore_shouldReturnBadRequest() throws URISyntaxException, IOException {
 
         //given
-        InputStream requestBody = new ByteArrayInputStream("1000".getBytes());
         Headers headers = new Headers();
         OutputStream responseBody = new ByteArrayOutputStream();
+        Map<String, String> queryParam = new HashMap<>();
+        queryParam.put("sessionkey", "");
 
-        when(exchange.getRequestURI()).thenReturn(new URI("/2/score?sessionkey="));
-        when(exchange.getRequestBody()).thenReturn(requestBody);
         when(exchange.getResponseHeaders()).thenReturn(headers);
         when(exchange.getResponseBody()).thenReturn(responseBody);
 
         //when
-        scoreController.execute(Actions.POST_SCORE, exchange);
+        scoreController.execute(Actions.POST_SCORE, exchange, "1000", "2", queryParam);
 
         //then
         Mockito.verify(exchange).sendResponseHeaders(httpStatusCodeCaptor.capture(), anyLong());
@@ -166,18 +164,17 @@ public class ScoreControllerTest {
     public void givenExpiredSession_whenExecuteRegisterScore_shouldReturnUnauthorised() throws URISyntaxException, IOException {
 
         //given
-        InputStream requestBody = new ByteArrayInputStream("1000".getBytes());
         Headers headers = new Headers();
         OutputStream responseBody = new ByteArrayOutputStream();
+        Map<String, String> queryParam = new HashMap<>();
+        queryParam.put("sessionkey", "UICSNDK");
 
-        when(exchange.getRequestURI()).thenReturn(new URI("/2/score?sessionkey=UICSNDK"));
-        when(exchange.getRequestBody()).thenReturn(requestBody);
         when(exchange.getResponseHeaders()).thenReturn(headers);
         when(exchange.getResponseBody()).thenReturn(responseBody);
         when(sessionService.isValid("UICSNDK")).thenReturn(false);
 
         //when
-        scoreController.execute(Actions.POST_SCORE, exchange);
+        scoreController.execute(Actions.POST_SCORE, exchange, "1000", "2", queryParam);
 
         //then
         Mockito.verify(exchange).sendResponseHeaders(httpStatusCodeCaptor.capture(), anyLong());
@@ -191,13 +188,12 @@ public class ScoreControllerTest {
         Headers headers = new Headers();
         OutputStream responseBody = new ByteArrayOutputStream();
 
-        when(exchange.getRequestURI()).thenReturn(new URI("/2/highscorelist"));
         when(exchange.getResponseHeaders()).thenReturn(headers);
         when(exchange.getResponseBody()).thenReturn(responseBody);
         when(scoreService.getHighestScores(anyInt())).thenReturn(anyString());
 
         //when
-        scoreController.execute(Actions.GET_HIGH_SCORE_LIST, exchange);
+        scoreController.execute(Actions.GET_HIGH_SCORE_LIST, exchange, null, "2", null);
 
         //then
         Mockito.verify(exchange).sendResponseHeaders(httpStatusCodeCaptor.capture(), anyLong());

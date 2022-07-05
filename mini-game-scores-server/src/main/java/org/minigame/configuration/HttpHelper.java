@@ -19,8 +19,7 @@ public class HttpHelper {
     private static Logger log = Logger.getLogger(HttpHelper.class.getName());
 
     private final String REGEX_URI = "/([0-9]+)/([a-zA-Z]+)";
-    public Pattern PATTERN_URI = Pattern.compile(REGEX_URI);
-    public final String SESSION_KEY = "sessionkey";
+    public final Pattern PATTERN_URI = Pattern.compile(REGEX_URI);
 
     public String readRequestBody(HttpExchange exchange) {
 

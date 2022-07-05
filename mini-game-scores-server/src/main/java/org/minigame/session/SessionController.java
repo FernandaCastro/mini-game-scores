@@ -6,6 +6,8 @@ import org.minigame.configuration.HttpHelper;
 import org.minigame.configuration.HttpStatus;
 import org.minigame.configuration.MiniGameException;
 
+import java.util.Map;
+
 public class SessionController implements Controller {
 
     private final HttpHelper httpHelper;
@@ -29,10 +31,10 @@ public class SessionController implements Controller {
     }
 
     @Override
-    public void execute(String action, HttpExchange exchange) {
+    public void execute(String action, HttpExchange exchange, String body, String pathVar, Map<String, String> queryParam) {
 
         try{
-            int userId = getUserId(exchange);
+            int userId = getUserId(exchange, pathVar);
             login(userId, exchange);
 
         }catch(MiniGameException e){
@@ -40,8 +42,7 @@ public class SessionController implements Controller {
         }
     }
 
-    private int getUserId(HttpExchange exchange){
-        String pathVar = httpHelper.getPathVariable(exchange);
+    private int getUserId(HttpExchange exchange, String pathVar){
         if (pathVar==null) {
             throw new MiniGameException(HttpStatus.BAD_REQUEST, "<UserId> is missing");
         }

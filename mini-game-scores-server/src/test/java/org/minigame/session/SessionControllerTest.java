@@ -45,12 +45,11 @@ public class SessionControllerTest {
         Headers headers = new Headers();
         OutputStream responseBody = new ByteArrayOutputStream();
 
-        when(exchange.getRequestURI()).thenReturn(new URI("//login"));
         when(exchange.getResponseHeaders()).thenReturn(headers);
         when(exchange.getResponseBody()).thenReturn(responseBody);
 
         //when
-        sessionController.execute(Actions.GET_LOGIN, exchange);
+        sessionController.execute(Actions.GET_LOGIN, exchange, "", null, null);
 
         //then
         Mockito.verify(exchange).sendResponseHeaders(httpStatusCodeCaptor.capture(), anyLong());
@@ -67,13 +66,12 @@ public class SessionControllerTest {
         Headers headers = new Headers();
         OutputStream responseBody = new ByteArrayOutputStream();
 
-        when(exchange.getRequestURI()).thenReturn(new URI("/4711/login"));
         when(exchange.getResponseHeaders()).thenReturn(headers);
         when(exchange.getResponseBody()).thenReturn(responseBody);
         when(sessionService.registerSession(anyInt())).thenReturn(session);
 
         //when
-        sessionController.execute(Actions.GET_LOGIN, exchange);
+        sessionController.execute(Actions.GET_LOGIN, exchange, "", "4711", null);
 
         //then
         verify(sessionService, times(1)).registerSession(4711);

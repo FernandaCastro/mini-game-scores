@@ -49,7 +49,7 @@ It accepts the following HTTP Requests:
 
 
 ###How to build the project
-The following instructions will perform **32 tests cases** related the **mini-game-scores-server** module,
+The following instructions will perform **36 tests cases** related the **mini-game-scores-server** module,
 and will also generate 2 executable JARs:
 
 - **mini-game-scores-server** : mini-game-scores-server-1.0-jar-with-dependencies.jar
@@ -63,6 +63,8 @@ and will also generate 2 executable JARs:
 2. Run ```chmod 775 mini-game-scores-server-1.0-jar-with-dependencies.jar```
 3. Run ```java -jar mini-game-scores-server-1.0-jar-with-dependencies.jar [<port> <threadPool>]```
    1. If no parameter is informed it will assume **port:8081** and **threadPool:100**
+   2. The property logLevel can also be informed. The default is **INFO**:
+      1. ```java -DlogLevel=FINE -jar mini-game-scores-server-1.0-jar-with-dependencies.jar```
 
 ###Points of Improvements and Considerations
 - **Define and implement a __purge process__ for the scores stored in memory.** 
