@@ -80,8 +80,8 @@ public class HttpDispatcherHandler implements HttpHandler {
             log.log(Level.SEVERE, e.getMessage());
 
         } catch (RuntimeException e){
-            String error = HttpStatus.INTERNAL_SERVER_ERROR.getMessage() + ": " + e.getMessage();
-            httpHelper.sendResponse(HttpStatus.INTERNAL_SERVER_ERROR, error, exchange);
+            log.log(Level.WARNING, e.getMessage());
+            httpHelper.sendResponse(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), exchange);
         }
     }
 

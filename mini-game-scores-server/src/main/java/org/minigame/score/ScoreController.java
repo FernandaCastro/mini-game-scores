@@ -57,8 +57,14 @@ public class ScoreController implements Controller {
             int levelId = getLevelId(exchange);
 
             switch (action) {
-                case Actions.POST_SCORE -> registerScore(levelId, exchange);
-                case Actions.GET_HIGH_SCORE_LIST -> getHighScoreList(levelId, exchange);
+
+                case Actions.POST_SCORE:
+                    registerScore(levelId, exchange);
+                    break;
+
+                case Actions.GET_HIGH_SCORE_LIST:
+                    getHighScoreList(levelId, exchange);
+                    break;
             }
 
         }catch(MiniGameException e){

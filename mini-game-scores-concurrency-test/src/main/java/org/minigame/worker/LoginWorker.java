@@ -39,10 +39,8 @@ public class LoginWorker implements Runnable{
         try {
             loginSignal.await();
 
-            log.log(Level.FINE, "Login started -{0}", List.of(Thread.currentThread().getName()).toArray());
-
             int userId = new Random().ints(1, 1000, 2000).findFirst().getAsInt();
-            HttpRequest request = HttpRequest.newBuilder().uri(URI.create(baseUri + userId + "/login")).build();
+            HttpRequest request = HttpRequest.newBuilder().uri(URI.create(baseUri + "/" + userId + "/login")).build();
             HttpResponse<String> response = null;
 
             response = client.send(request, HttpResponse.BodyHandlers.ofString());

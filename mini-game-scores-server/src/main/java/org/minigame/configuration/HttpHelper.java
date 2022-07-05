@@ -49,7 +49,6 @@ public class HttpHelper {
             OutputStream responseBody = exchange.getResponseBody();
             responseBody.write(response.getBytes());
 
-            log.log(Level.INFO, "HTTP Status Code: {0} - Response: {1}", List.of(httpStatus.getStatusCode(), response).toArray());
             exchange.close();
 
         }catch (IOException e){

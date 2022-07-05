@@ -36,10 +36,8 @@ public class RankingWorker implements Runnable{
         try {
             barrierRanking.await();
 
-            log.log(Level.FINE, "Ranking-{0}", List.of(Thread.currentThread().getName()).toArray());
-
             int levelId = new Random().ints(1, 0, 9).findFirst().getAsInt();
-            HttpRequest request = HttpRequest.newBuilder().uri(URI.create(baseUri +  levelId + "/highscorelist")).build();
+            HttpRequest request = HttpRequest.newBuilder().uri(URI.create(baseUri + "/" + levelId + "/highscorelist")).build();
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             if (200 != response.statusCode()){

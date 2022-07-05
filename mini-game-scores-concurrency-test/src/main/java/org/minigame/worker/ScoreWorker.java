@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 
 public class ScoreWorker implements Runnable{
 
-    Logger log = Logger.getLogger(ScoreWorker.class.getName());
+    private static Logger log = Logger.getLogger(ScoreWorker.class.getName());
 
     private final CyclicBarrier scoreSignal;
     private final CountDownLatch doneSignal;
@@ -36,8 +36,8 @@ public class ScoreWorker implements Runnable{
         try {
             scoreSignal.await();
 
-            log.log(Level.FINE, "ScoreWorker-{0}", List.of(Thread.currentThread().getId()).toArray());
-            String sessionKey = sessionKeyQueue.poll(2, TimeUnit.SECONDS);
+            String sessionKey = sessionKeyQueue.poll(15, TimeUnit.SECONDS);
+            //String sessionKey = sessionKeyQueue.take();
             if(sessionKey==null){
                 sessionKey="";
             }
@@ -45,7 +45,7 @@ public class ScoreWorker implements Runnable{
             int levelId = new Random().ints(1, 0, 9).findFirst().getAsInt();
             String score = String.valueOf(new Random().ints(1, 1000, 10000).findFirst().getAsInt());
 
-            HttpRequest request = HttpRequest.newBuilder().uri(URI.create(baseUri +  levelId + "/score?sessionkey="+sessionKey))
+            HttpRequest request = HttpRequest.newBuilder().uri(URI.create(baseUri + "/" + levelId + "/score?sessionkey="+sessionKey))
                     .POST(HttpRequest.BodyPublishers.ofString(score))
                     .build();
 
