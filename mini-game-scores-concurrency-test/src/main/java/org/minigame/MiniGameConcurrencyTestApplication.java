@@ -27,7 +27,6 @@ public class MiniGameConcurrencyTestApplication {
         System.setProperty("java.util.logging.SimpleFormatter.format", "[%1$tF %1$tT %1$tL] [%4$-7s] %5$s %n");
     }
 
-    //-DlogLevel=INFO -Dhostname=localhost -Dport=8081 -Dlogin=1550 -Dscore=1500 -ranking=800
     public static void main(String[] args) {
 
         MiniGameConcurrencyTestApplication concurrencyTest = new MiniGameConcurrencyTestApplication();

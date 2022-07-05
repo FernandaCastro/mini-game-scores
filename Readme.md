@@ -77,6 +77,10 @@ A small application was developed to test concurrency **[ mini-game-scores-concu
 
 It uses CycleBarrier synchronizer to wait until all thread have started, and it also uses CountDownLatch synchronizer to wait until all threads complete. 
 
+A BlockingQueue<String> is used to share the sessionKey, where the LoginWorker adds sessionKey to the queue, and the ScoreWorker pools from it. 
+
+So keep in mind that when ScoreWorker has no sessionKey to use the request will return: [400: Score Missing or invalid <sessionkey> parameter]   
+
 So that a simple analysis of the responses for the concurrent requests is made at the end.
 
 ####How to run the Concurrency Test application
@@ -89,9 +93,9 @@ So that a simple analysis of the responses for the concurrent requests is made a
    ---| ---| ---
    hostname | localhost | Mini Game Server hostname
    port | 8081 | Mini Game server port 
-   login |1550 | Number of threads sending ``GET /<userid>/login``requests 
+   login |1500 | Number of threads sending ``GET /<userid>/login``requests 
    score | 1450 | Number of threads sending ``POST /<levelid>/score?sessionkey=<sessionkey>``requests 
-   ranking | 800 | Number of threads sending ``GET /<levelid>/highscorelist``requests
+   ranking | 1000 | Number of threads sending ``GET /<levelid>/highscorelist``requests
    logLevel | INFO | Defines the granularity of the log messages: OFF, SEVERE, WARNING, INFO, CONFIG, FINE, FINER, FINEST, ALL 
 
 Example:
