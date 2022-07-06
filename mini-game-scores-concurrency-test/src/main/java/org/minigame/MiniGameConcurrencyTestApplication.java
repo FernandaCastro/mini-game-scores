@@ -4,7 +4,6 @@ import org.minigame.worker.LoginWorker;
 import org.minigame.worker.RankingWorker;
 import org.minigame.worker.ScoreWorker;
 
-import java.lang.annotation.Target;
 import java.net.http.HttpClient;
 import java.time.Duration;
 import java.time.Instant;
@@ -110,7 +109,7 @@ public class MiniGameConcurrencyTestApplication {
             allDoneSignal.await(); //Wait for all threads to finish
 
         } catch (InterruptedException e) {
-            log.log(Level.SEVERE, e.getStackTrace().toString());
+            log.log(Level.SEVERE, e.getMessage());
         }
 
         log.log(Level.INFO, "All threads complete");
@@ -127,7 +126,7 @@ public class MiniGameConcurrencyTestApplication {
     }
 
     private void setLevel(String logLevel) {
-        Level targetLevel = null;
+        Level targetLevel;
         try {
             targetLevel = Level.parse(logLevel);
             Logger root = Logger.getLogger("");

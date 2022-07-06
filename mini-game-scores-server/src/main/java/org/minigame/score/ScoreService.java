@@ -23,7 +23,7 @@ public class ScoreService implements Service {
             return "";
         }
 
-        //TODO: find better alternative to limit() and toSet()/distinct() due to low performance
+        //TODO: find better alternative to limit() and toSet()/distinct() due to possibly low performance
         var filtered = scores.parallelStream()
                 .limit(15)
                 .collect(Collectors.toSet());
@@ -32,19 +32,7 @@ public class ScoreService implements Service {
                 .sorted()
                 .map(s -> s.getUserId() + "="+ s.getScore())
                 .collect(Collectors.joining(","));
-
-//        var iterator = scores.iterator();
-//        int count = 0;
-//        StringBuilder builder = new StringBuilder();
-//        List<Integer> userIds = new ArrayList<>();
-//        while(iterator.hasNext() && count < 15){
-//            var score = iterator.next();
-//            if(userIds.indexOf(score.getUserId()) == -1){
-//                builder.append(score.getUserId()+"="+ score.getScore()+",");
-//                userIds.add(score.getUserId());
-//                count ++;
-//            }
-//        }
-//        return builder.toString().substring(0, builder.length()-1);
     }
+
+    //TODO: Implement a Purge to clean ScoreRepository
 }

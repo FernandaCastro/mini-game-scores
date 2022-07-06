@@ -13,7 +13,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Clock;
 
@@ -40,7 +39,7 @@ public class SessionControllerTest {
     SessionController sessionController;
 
     @Test
-    public void givenBadURI_whenExecuteLogin_shouldReturnBadRequest() throws IOException, URISyntaxException {
+    public void givenBadURI_whenExecuteLogin_shouldReturnBadRequest() throws IOException{
         //given
         Headers headers = new Headers();
         OutputStream responseBody = new ByteArrayOutputStream();
@@ -60,7 +59,7 @@ public class SessionControllerTest {
     }
 
     @Test
-    public void givenGoodURI_whenExecuteLogin_shouldRegisterSession() throws URISyntaxException, IOException {
+    public void givenGoodURI_whenExecuteLogin_shouldRegisterSession() throws IOException {
         //given
         Session session = new Session(4711, Clock.systemUTC().millis());
         Headers headers = new Headers();

@@ -28,18 +28,12 @@ public class SessionService implements Service {
 
     public boolean isValid(String sessionKey){
         Session session = sessionRepository.get(sessionKey);
-        if (session != null && session.isValid(clock)){
-            return true;
-        }
-        return false;
+        return session != null && session.isValid(clock);
     }
 
     public Session get(String sessionKey){
         return sessionRepository.get(sessionKey);
     }
 
-    //TODO: Purge expired sessions
-
-
-
+    //TODO: Implement a Purge to clean expired sessions
 }

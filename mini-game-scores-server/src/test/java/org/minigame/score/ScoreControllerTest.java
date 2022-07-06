@@ -12,7 +12,9 @@ import org.minigame.session.SessionService;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.time.Clock;
 import java.util.HashMap;
@@ -44,7 +46,7 @@ public class ScoreControllerTest {
     ScoreController scoreController;
 
     @Test
-    public void givenGoodLevelIdAndScore_whenExecuteRegisterScore_shouldReturnOK() throws URISyntaxException, IOException {
+    public void givenGoodLevelIdAndScore_whenExecuteRegisterScore_shouldReturnOK() throws IOException {
 
         //given
         Headers headers = new Headers();
@@ -73,7 +75,7 @@ public class ScoreControllerTest {
     }
 
     @Test
-    public void givenBadLevelId_whenExecuteRegisterScore_shouldReturnBadRequest() throws URISyntaxException, IOException {
+    public void givenBadLevelId_whenExecuteRegisterScore_shouldReturnBadRequest() throws IOException {
 
         //given
         Headers headers = new Headers();
@@ -95,7 +97,7 @@ public class ScoreControllerTest {
     }
 
     @Test
-    public void givenMissingScore_whenExecuteRegisterScore_shouldReturnBadRequest() throws URISyntaxException, IOException {
+    public void givenMissingScore_whenExecuteRegisterScore_shouldReturnBadRequest() throws IOException {
 
         //given
         Headers headers = new Headers();
@@ -117,7 +119,7 @@ public class ScoreControllerTest {
     }
 
     @Test
-    public void givenBadScore_whenExecuteRegisterScore_shouldReturnBadRequest() throws URISyntaxException, IOException {
+    public void givenBadScore_whenExecuteRegisterScore_shouldReturnBadRequest() throws IOException {
 
         //given
         Headers headers = new Headers();
@@ -139,7 +141,7 @@ public class ScoreControllerTest {
     }
 
     @Test
-    public void givenBadQueryParam_whenExecuteRegisterScore_shouldReturnBadRequest() throws URISyntaxException, IOException {
+    public void givenBadQueryParam_whenExecuteRegisterScore_shouldReturnBadRequest() throws IOException {
 
         //given
         Headers headers = new Headers();
@@ -161,7 +163,7 @@ public class ScoreControllerTest {
     }
 
     @Test
-    public void givenExpiredSession_whenExecuteRegisterScore_shouldReturnUnauthorised() throws URISyntaxException, IOException {
+    public void givenExpiredSession_whenExecuteRegisterScore_shouldReturnUnauthorised() throws IOException {
 
         //given
         Headers headers = new Headers();
@@ -184,7 +186,7 @@ public class ScoreControllerTest {
     }
 
     @Test
-    public void givenGoodLevelId_whenExecuteGetHighScoreList_shouldReturnOKAndScoreList() throws URISyntaxException, IOException {
+    public void givenGoodLevelId_whenExecuteGetHighScoreList_shouldReturnOKAndScoreList() throws IOException {
         Headers headers = new Headers();
         OutputStream responseBody = new ByteArrayOutputStream();
 

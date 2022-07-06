@@ -114,6 +114,10 @@ Example of output:
 [2022-07-04 15:42:39 558] [INFO   ] NOT OK[200] Responses: 0 
 ```
 
+###Diagram of one of the scenarios
+![img.png](img.png)
+
+
 
 
 

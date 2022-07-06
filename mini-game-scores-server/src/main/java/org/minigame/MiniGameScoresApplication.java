@@ -9,6 +9,7 @@ import org.minigame.score.ScoreService;
 import org.minigame.session.SessionController;
 import org.minigame.session.SessionRepository;
 import org.minigame.session.SessionService;
+
 import java.time.Clock;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -52,7 +53,7 @@ public class MiniGameScoresApplication {
 
 
     private static void setLevel(String logLevel) {
-        Level targetLevel = null;
+        Level targetLevel;
         try {
             targetLevel = Level.parse(logLevel);
             Logger root = Logger.getLogger("");
