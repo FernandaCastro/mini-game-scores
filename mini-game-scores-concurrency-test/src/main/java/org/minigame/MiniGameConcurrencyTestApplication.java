@@ -32,9 +32,9 @@ public class MiniGameConcurrencyTestApplication {
 
         String hostname = "localhost";
         int port = 8081;
-        int nLoginWorkers = 1500;
-        int nScoreWorkers = 1450;
-        int nRankingWorker = 1000;
+        int nLoginWorkers = 1000;
+        int nScoreWorkers = 1000;
+        int nRankingWorker = 500;
 
         String logLevel = System.getProperty("logLevel");
         if(logLevel !=null){

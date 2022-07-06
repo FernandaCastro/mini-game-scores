@@ -49,7 +49,7 @@ It accepts the following HTTP Requests:
 
 
 ###How to build the project
-The following instructions will perform **36 tests cases** related the **mini-game-scores-server** module,
+The following instructions will perform **38 tests cases** related the **mini-game-scores-server** module,
 and will also generate 2 executable JARs:
 
 - **mini-game-scores-server** : mini-game-scores-server-1.0-jar-with-dependencies.jar
@@ -95,9 +95,9 @@ So that a simple analysis of the responses for the concurrent requests is made a
    ---| ---| ---
    hostname | localhost | Mini Game Server hostname
    port | 8081 | Mini Game server port 
-   login |1500 | Number of threads sending ``GET /<userid>/login``requests 
-   score | 1450 | Number of threads sending ``POST /<levelid>/score?sessionkey=<sessionkey>``requests 
-   ranking | 1000 | Number of threads sending ``GET /<levelid>/highscorelist``requests
+   login |1000 | Number of threads sending ``GET /<userid>/login``requests 
+   score | 1000 | Number of threads sending ``POST /<levelid>/score?sessionkey=<sessionkey>``requests 
+   ranking | 500 | Number of threads sending ``GET /<levelid>/highscorelist``requests
    logLevel | INFO | Defines the granularity of the log messages: OFF, SEVERE, WARNING, INFO, CONFIG, FINE, FINER, FINEST, ALL 
 
 Example:
@@ -115,8 +115,7 @@ Example of output:
 ```
 
 ###Diagram of one of the scenarios
-![img.png](img.png)
-
+![img_2.png](img_2.png)
 
 
 

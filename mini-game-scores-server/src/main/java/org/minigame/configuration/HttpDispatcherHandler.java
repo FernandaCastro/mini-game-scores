@@ -50,7 +50,8 @@ public class HttpDispatcherHandler implements HttpHandler {
 
             Controller controller = getController(actionKey, exchange);
             if (controller != null) {
-                controller.execute(actionKey, exchange, body, pathVar, queryParam);
+                var response = controller.execute(actionKey, body, pathVar, queryParam);
+                httpHelper.sendResponse(response.getHttpStatus(), response.getMessage(), exchange);
             }
 
         } catch (MiniGameException e) {

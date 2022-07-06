@@ -1,12 +1,9 @@
 package org.minigame.session;
 
 import java.time.Clock;
-import java.time.Duration;
 import java.util.Random;
 
 public class Session {
-
-    private final long EXPIRATION_TIME = Duration.ofMinutes(10).toMillis();
 
     private final int userId;
 
@@ -32,8 +29,8 @@ public class Session {
         return createdAt;
     }
 
-    public boolean isValid(Clock clock){
-        return (clock.millis() - createdAt) < EXPIRATION_TIME;
+    public boolean isValid(Clock clock, long expirationTime){
+        return (clock.millis() - createdAt) < expirationTime;
     }
 
     private String generateSessionKey() {
