@@ -5,6 +5,7 @@ import org.minigame.worker.RankingWorker;
 import org.minigame.worker.ScoreWorker;
 
 import java.net.http.HttpClient;
+import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -26,7 +27,7 @@ public class MiniGameConcurrencyTestApplication {
         System.setProperty("java.util.logging.SimpleFormatter.format", "[%1$tF %1$tT %1$tL] [%4$-7s] %5$s %n");
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
 
         MiniGameConcurrencyTestApplication concurrencyTest = new MiniGameConcurrencyTestApplication();
 
@@ -37,38 +38,41 @@ public class MiniGameConcurrencyTestApplication {
         int nRankingWorker = 500;
 
         String logLevel = System.getProperty("logLevel");
-        if(logLevel !=null){
+        if (logLevel != null) {
             concurrencyTest.setLevel(logLevel);
         }
 
         String _hostname = System.getProperty("hostname");
-        if(_hostname !=null){
+        if (_hostname != null) {
             hostname = _hostname;
         }
 
         String _port = System.getProperty("port");
-        if(_port !=null){
+        if (_port != null) {
             port = Integer.parseInt(_port);
         }
 
         String _nLoginWorkers = System.getProperty("login");
-        if(_nLoginWorkers !=null){
+        if (_nLoginWorkers != null) {
             nLoginWorkers = Integer.parseInt(_nLoginWorkers);
         }
 
         String _nScoreWorkers = System.getProperty("score");
-        if(_nScoreWorkers !=null){
+        if (_nScoreWorkers != null) {
             nScoreWorkers = Integer.parseInt(_nScoreWorkers);
         }
 
         String _nRankingWorkers = System.getProperty("ranking");
-        if(_nRankingWorkers !=null){
+        if (_nRankingWorkers != null) {
             nRankingWorker = Integer.parseInt(_nRankingWorkers);
         }
 
-        String baseUri = "http://"+ hostname + ":"+ port;
+        String baseUri = "http://" + hostname + ":" + port;
 
-        concurrencyTest.process(baseUri,  nLoginWorkers, nScoreWorkers, nRankingWorker);
+        while (true){
+            concurrencyTest.process(baseUri, nLoginWorkers, nScoreWorkers, nRankingWorker);
+            Thread.sleep(Duration.ofMinutes(1).toMillis());
+        }
 
     }
 

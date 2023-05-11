@@ -1,11 +1,9 @@
 package org.minigame.session;
 
-import org.minigame.configuration.Service;
-
 import java.time.Clock;
 import java.time.Duration;
 
-public class SessionService implements Service {
+public class SessionService {
 
     private final long EXPIRATION_TIME = Duration.ofMinutes(10).toMillis();
 
@@ -18,15 +16,18 @@ public class SessionService implements Service {
     }
 
     public Session registerSession(int userId){
-        var existingSession = sessionRepository.get(userId);
-        if (existingSession != null && existingSession.isValid(clock, EXPIRATION_TIME)){
+
+        var existingSession = sessionRepository.getValidSession(userId, clock, EXPIRATION_TIME);
+        if (existingSession != null){
             return existingSession;
         }
 
-         var session = new Session(userId, clock.millis());
-         sessionRepository.save(session);
-         sessionRepository.save(userId, session);
-         return session;
+        Session session = new Session(userId, clock.millis());
+//        while (sessionRepository.get(session.getSessionKey()) != null) {
+//            session = new Session(userId, clock.millis());
+//        }
+        sessionRepository.save(session);
+        return session;
     }
 
     public boolean isValid(String sessionKey){
@@ -38,5 +39,7 @@ public class SessionService implements Service {
         return sessionRepository.get(sessionKey);
     }
 
-    //TODO: Implement a Purge to clean expired sessions
+    public int purge(){
+        return sessionRepository.purge(clock, EXPIRATION_TIME);
+    }
 }

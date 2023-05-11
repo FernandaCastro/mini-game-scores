@@ -5,6 +5,10 @@ Coded and tested using ```JDK 11```
 Mini Game Scores is an HTTP-based mini game back-end in Java which registers game scores for different users and
 levels, with the capability to return a list ranking the 15 highest scores of a level.
 
+The ranking per level considers only the latest score of the user. 
+
+Equal scores per level are ranked then by userId in a natural order.
+
 It has a simple login-system in place (without any authentication) which returns a session key that is valid for 10 minutes.
 
 It accepts the following HTTP Requests:

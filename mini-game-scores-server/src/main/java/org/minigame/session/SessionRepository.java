@@ -1,14 +1,11 @@
 package org.minigame.session;
 
-import org.minigame.configuration.Repository;
-
+import java.time.Clock;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class SessionRepository implements Repository {
+public class SessionRepository {
 
-    //TODO: check it default is enough. Default initial capacity (16), load factor (0.75) and concurrencyLevel (16).
     private final ConcurrentHashMap<String, Session> sessions = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<Integer, Session> userSessions = new ConcurrentHashMap<>();
 
     public void save(Session session){
         sessions.put(session.getSessionKey(), session);
@@ -18,12 +15,18 @@ public class SessionRepository implements Repository {
         return sessions.get(sessionKey);
     }
 
-    public void save(int userId, Session session){
-        userSessions.put(userId, session);
+    public Session getValidSession(int userId, Clock clock, long expiration){
+        for (Session session : sessions.values()) {
+            if (session.getUserId() == userId && session.isValid(clock, expiration))
+                return session;
+        }
+        return null;
     }
 
-    public Session get(int userId){
-        return userSessions.get(userId);
+    public int purge(Clock clock, long expiration){
+        int size = sessions.size();
+        sessions.values().removeIf(s -> !s.isValid(clock, expiration));
+        return size - sessions.size();
     }
 
 }

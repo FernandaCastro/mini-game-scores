@@ -37,11 +37,10 @@ public class ScoreControllerTest {
         Map<String, String> queryParam = new HashMap<>();
         queryParam.put("sessionkey", "UICSNDK");
 
+        //when
         when(sessionService.isValid("UICSNDK")).thenReturn(true);
         when(sessionService.get("UICSNDK")).thenReturn(session);
         doNothing().when(scoreService).save(any(Score.class));
-
-        //when
         var response = scoreController.execute(Actions.POST_SCORE,"1000", "2", queryParam);
 
         //then

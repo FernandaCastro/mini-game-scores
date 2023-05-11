@@ -1,6 +1,7 @@
 package org.minigame.session;
 
 import java.time.Clock;
+import java.util.Objects;
 import java.util.Random;
 
 public class Session {
@@ -38,5 +39,19 @@ public class Session {
         return new Random().ints(7, 65, 90)
                 .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
                 .toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Session)) return false;
+        Session session = (Session) o;
+        return getUserId() == session.getUserId() && getSessionKey().equals(session.getSessionKey());
+
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getUserId(), getSessionKey());
     }
 }

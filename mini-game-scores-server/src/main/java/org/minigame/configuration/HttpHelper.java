@@ -22,7 +22,6 @@ public class HttpHelper {
     public String readRequestBody(HttpExchange exchange) {
 
         try {
-
             BufferedReader reader = new BufferedReader(new InputStreamReader(exchange.getRequestBody()));
             StringBuilder stringBuilder = new StringBuilder();
 

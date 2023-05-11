@@ -44,11 +44,14 @@ public class HttpDispatcherHandler implements HttpHandler {
                 throw new MiniGameException(HttpStatus.BAD_REQUEST, "PathParam and/or Action are invalid");
             }
 
-            String body = httpHelper.readRequestBody(exchange);
+            String body = "";
+            if(exchange.getRequestMethod().equals("POST")) {
+                body = httpHelper.readRequestBody(exchange);
+            }
             String pathVar = httpHelper.getPathVariable(exchange);
             Map<String, String> queryParam = httpHelper.getQueryParam(exchange);
 
-            Controller controller = getController(actionKey, exchange);
+            Controller controller = getController(actionKey);
             if (controller != null) {
                 var response = controller.execute(actionKey, body, pathVar, queryParam);
                 httpHelper.sendResponse(response.getHttpStatus(), response.getMessage(), exchange);
@@ -66,7 +69,7 @@ public class HttpDispatcherHandler implements HttpHandler {
         }
     }
 
-    private Controller getController(String action, HttpExchange exchange){
+    private Controller getController(String action){
 
         switch (action) {
             case Actions.GET_LOGIN:
