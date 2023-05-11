@@ -5,12 +5,16 @@ import com.sun.net.httpserver.HttpHandler;
 import org.minigame.score.ScoreController;
 import org.minigame.session.SessionController;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class HttpDispatcherHandler implements HttpHandler {
 
@@ -24,62 +28,84 @@ public class HttpDispatcherHandler implements HttpHandler {
         this.httpHelper = httpHelper;
     }
 
-    public static final Set<String> httpContext = Set.of(
-            Actions.GET_LOGIN,
-            Actions.POST_SCORE,
-            Actions.GET_HIGH_SCORE_LIST
+    private Map<Pattern, String> uriContext = Map.ofEntries(
+            Map.entry(Pattern.compile("^/(?<userId>\\d*)/login"), "org.minigame.session.SessionController::login"),
+            Map.entry(Pattern.compile("^/(?<levelId>\\d*)/score"), "org.minigame.score.ScoreController::registerScore"),
+            Map.entry(Pattern.compile("^/(?<levelId>\\d*)/highscorelist"), "org.minigame.score.ScoreController::getHighScoreList")
     );
 
     @Override
     public void handle(HttpExchange exchange) {
         try {
-            URI uri = exchange.getRequestURI();
-            Matcher matcher = httpHelper.PATTERN_URI.matcher(uri.getPath());
-            if (!matcher.matches()) {
-                throw new MiniGameException(HttpStatus.BAD_REQUEST, "URI requested is invalid" );
-            }
+            var classMethod = lookupURI(exchange);
+            var method = getMethod(exchange, classMethod);
 
-            String actionKey = exchange.getRequestMethod() + "/" + matcher.group(2);
-            if (!httpContext.contains(actionKey)) {
-                throw new MiniGameException(HttpStatus.BAD_REQUEST, "PathParam and/or Action are invalid");
-            }
-
-            String body = "";
-            if(exchange.getRequestMethod().equals("POST")) {
-                body = httpHelper.readRequestBody(exchange);
-            }
             String pathVar = httpHelper.getPathVariable(exchange);
             Map<String, String> queryParam = httpHelper.getQueryParam(exchange);
 
-            Controller controller = getController(actionKey);
-            if (controller != null) {
-                var response = controller.execute(actionKey, body, pathVar, queryParam);
-                httpHelper.sendResponse(response.getHttpStatus(), response.getMessage(), exchange);
+            MiniGameResponse response;
+
+            if (exchange.getRequestMethod().equals("POST")) {
+                String body = httpHelper.readRequestBody(exchange);
+                response = (MiniGameResponse) method.invoke(rootContext.get(Class.forName(classMethod[0])), body, pathVar, queryParam);
+
+            } else {
+                response = (MiniGameResponse) method.invoke(rootContext.get(Class.forName(classMethod[0])), pathVar, queryParam);
             }
+
+            httpHelper.sendResponse(response.getHttpStatus(), response.getMessage(), exchange);
 
         } catch (MiniGameException e) {
             httpHelper.sendResponse(e.getHttpStatus(), e.getMessage(), exchange);
 
+        }catch (InvocationTargetException e){
+
+            if (e.getTargetException()!=null && e.getTargetException() instanceof MiniGameException){
+                var appException = (MiniGameException)e.getTargetException();
+                httpHelper.sendResponse(appException.getHttpStatus(), appException.getMessage(), exchange);
+
+            }else{
+                log.log(Level.WARNING, e.getMessage());
+                httpHelper.sendResponse(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), exchange);
+            }
+
         } catch (IllegalStateException e) {
             log.log(Level.SEVERE, e.getMessage());
 
-        } catch (RuntimeException e){
+        }  catch (RuntimeException|ReflectiveOperationException e) {
             log.log(Level.WARNING, e.getMessage());
             httpHelper.sendResponse(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), exchange);
         }
     }
 
-    private Controller getController(String action){
+    private String[] lookupURI(HttpExchange exchange) {
+        URI uri = exchange.getRequestURI();
+        String[] classMethod = null;
 
-        switch (action) {
-            case Actions.GET_LOGIN:
-                return (SessionController) rootContext.get(SessionController.class);
-            case Actions.POST_SCORE:
-            case Actions.GET_HIGH_SCORE_LIST:
-                return (ScoreController) rootContext.get(ScoreController.class);
-            default:
-                throw new MiniGameException(HttpStatus.NOT_FOUND, "Action not found");
+        for (Pattern entry : uriContext.keySet()) {
+            if (entry.matcher(uri.getPath()).matches()) {
+                classMethod = uriContext.get(entry).split("::");
+                break;
+            }
         }
+        if (classMethod == null) {
+            throw new MiniGameException(HttpStatus.BAD_REQUEST, "URI requested is invalid");
+        }
+        return classMethod;
+    }
+
+    private Method getMethod(HttpExchange exchange, String[] classMethod) throws ClassNotFoundException, NoSuchMethodException {
+
+        var classController = Class.forName(classMethod[0]);
+        Method method;
+
+        if (exchange.getRequestMethod().equals("POST")) {
+            method = classController.getMethod(classMethod[1], String.class, String.class, Map.class);
+        } else {
+            method = classController.getMethod(classMethod[1], String.class, Map.class);
+        }
+
+        return method;
     }
 
 }

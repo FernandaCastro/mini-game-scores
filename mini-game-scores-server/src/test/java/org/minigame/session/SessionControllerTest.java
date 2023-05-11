@@ -1,14 +1,14 @@
 package org.minigame.session;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.minigame.configuration.Actions;
 import org.minigame.configuration.HttpStatus;
+import org.minigame.configuration.MiniGameException;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.io.IOException;
 import java.time.Clock;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -25,48 +25,46 @@ public class SessionControllerTest {
 
     @Test
     public void givenNullUserId_whenExecuteLogin_shouldReturnBadRequest(){
-        //given
-
 
         //when
-        var response = sessionController.execute(Actions.GET_LOGIN, "", null, null);
+        var thrown = Assertions.assertThrows(MiniGameException.class,
+                () -> sessionController.login(null, null));
 
         //then
-        assertEquals(HttpStatus.BAD_REQUEST, response.getHttpStatus());
+        assertEquals(HttpStatus.BAD_REQUEST, thrown.getHttpStatus());
     }
 
     @Test
     public void givenBadUserId_whenExecuteLogin_shouldReturnBadRequest(){
-        //given
-
 
         //when
-        var response = sessionController.execute(Actions.GET_LOGIN, "", "ABCD", null);
+        var thrown = Assertions.assertThrows(MiniGameException.class,
+                () -> sessionController.login("ABCD", null));
 
         //then
-        assertEquals(HttpStatus.BAD_REQUEST, response.getHttpStatus());
+        assertEquals(HttpStatus.BAD_REQUEST, thrown.getHttpStatus());
     }
 
     @Test
     public void givenMissingUserId_whenExecuteLogin_shouldReturnBadRequest(){
-        //given
-
 
         //when
-        var response = sessionController.execute(Actions.GET_LOGIN, "", "", null);
+        var thrown = Assertions.assertThrows(MiniGameException.class,
+                () -> sessionController.login("", null));
 
         //then
-        assertEquals(HttpStatus.BAD_REQUEST, response.getHttpStatus());
+        assertEquals(HttpStatus.BAD_REQUEST, thrown.getHttpStatus());
     }
 
     @Test
-    public void givenGoodURI_whenExecuteLogin_shouldRegisterSession(){
+    public void givenGoodURI_whenLogin_shouldRegisterSession(){
         //given
         Session session = new Session(4711, Clock.systemUTC().millis());
         when(sessionService.registerSession(anyInt())).thenReturn(session);
 
         //when
-        var response = sessionController.execute(Actions.GET_LOGIN, "", "4711", null);
+        //var response = sessionController.execute(Actions.GET_LOGIN, "", "4711", null);
+        var response = sessionController.login("4711", null);
 
         //then
         verify(sessionService, times(1)).registerSession(4711);

@@ -4,7 +4,6 @@ import org.minigame.configuration.HttpHelper;
 import org.minigame.configuration.MiniGameHttpServer;
 import org.minigame.configuration.PurgeTask;
 import org.minigame.configuration.RootContext;
-import org.minigame.score.Score;
 import org.minigame.score.ScoreController;
 import org.minigame.score.ScoreRepository;
 import org.minigame.score.ScoreService;
@@ -12,7 +11,6 @@ import org.minigame.session.SessionController;
 import org.minigame.session.SessionRepository;
 import org.minigame.session.SessionService;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Clock;
@@ -20,8 +18,7 @@ import java.time.Duration;
 import java.util.Properties;
 import java.util.Timer;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.logging.*;
+import java.util.logging.Logger;
 
 public class MiniGameScoresApplication {
 
@@ -29,7 +26,7 @@ public class MiniGameScoresApplication {
         System.setProperty("java.util.logging.config.file", MiniGameScoresApplication.class.getClassLoader().getResource("application.properties").getFile());
     }
 
-    private static Logger LOGGER = Logger.getLogger(MiniGameScoresApplication.class.getName());
+    private static Logger log = Logger.getLogger(MiniGameScoresApplication.class.getName());
 
     public static void main(String[] args) throws IOException {
 
@@ -41,6 +38,7 @@ public class MiniGameScoresApplication {
                 System.setProperty(name, value);
             }
         }catch (SecurityException|IOException ex){
+            log.severe(ex.getMessage());
             throw ex;
         }
 
@@ -57,10 +55,10 @@ public class MiniGameScoresApplication {
         rootContext.add(new HttpHelper());
         rootContext.add(new SessionRepository());
         rootContext.add(new SessionService((SessionRepository)rootContext.get(SessionRepository.class), rootContext.getClock()));
-        rootContext.add(new SessionController((HttpHelper)rootContext.get(HttpHelper.class), (SessionService) rootContext.get(SessionService.class)));
-        rootContext.add(new ScoreRepository(new ConcurrentHashMap<Integer, ConcurrentSkipListSet<Score>>()));
+        rootContext.add(new SessionController((SessionService) rootContext.get(SessionService.class)));
+        rootContext.add(new ScoreRepository(new ConcurrentHashMap<>()));
         rootContext.add(new ScoreService((ScoreRepository)rootContext.get(ScoreRepository.class)));
-        rootContext.add(new ScoreController((HttpHelper)rootContext.get(HttpHelper.class), (SessionService)rootContext.get(SessionService.class), (ScoreService)rootContext.get(ScoreService.class)));
+        rootContext.add(new ScoreController((SessionService)rootContext.get(SessionService.class), (ScoreService)rootContext.get(ScoreService.class)));
 
         PurgeTask purgeTask = new PurgeTask((SessionService)rootContext.get(SessionService.class), (ScoreService)rootContext.get(ScoreService.class));
         Timer timer = new Timer();

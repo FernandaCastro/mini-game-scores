@@ -33,7 +33,9 @@ public class ScoreControllerBlackBoxIntegrationTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
         assertEquals(HttpStatus.OK.getStatusCode(), response.statusCode());
+
         String sessionKey = response.body();
+
         request = HttpRequest.newBuilder().uri(URI.create("http://localhost:8081/1/score?sessionkey="+sessionKey))
                 .POST(HttpRequest.BodyPublishers.ofString("1000"))
                 .build();
@@ -51,7 +53,9 @@ public class ScoreControllerBlackBoxIntegrationTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
         assertEquals(HttpStatus.OK.getStatusCode(), response.statusCode());
+
         String sessionKey = response.body();
+
         request = HttpRequest.newBuilder().uri(URI.create("http://localhost:8081/1/score?sessionkey="+sessionKey))
                 .POST(HttpRequest.BodyPublishers.noBody())
                 .build();

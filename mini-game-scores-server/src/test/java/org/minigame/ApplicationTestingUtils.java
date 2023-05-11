@@ -25,10 +25,10 @@ public class ApplicationTestingUtils {
         rootContext.add(new HttpHelper());
         rootContext.add(new SessionRepository());
         rootContext.add(new SessionService((SessionRepository)rootContext.get(SessionRepository.class), rootContext.getClock()));
-        rootContext.add(new SessionController((HttpHelper)rootContext.get(HttpHelper.class), (SessionService) rootContext.get(SessionService.class)));
-        rootContext.add(new ScoreRepository(new ConcurrentHashMap<Integer, ConcurrentSkipListSet<Score>>()));
+        rootContext.add(new SessionController((SessionService) rootContext.get(SessionService.class)));
+        rootContext.add(new ScoreRepository(new ConcurrentHashMap<>()));
         rootContext.add(new ScoreService((ScoreRepository)rootContext.get(ScoreRepository.class)));
-        rootContext.add(new ScoreController((HttpHelper)rootContext.get(HttpHelper.class), (SessionService)rootContext.get(SessionService.class), (ScoreService)rootContext.get(ScoreService.class)));
+        rootContext.add(new ScoreController((SessionService)rootContext.get(SessionService.class), (ScoreService)rootContext.get(ScoreService.class)));
 
         httpServer = new MiniGameHttpServer(rootContext);
         httpServer.start(port, threadPool);

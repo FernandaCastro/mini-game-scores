@@ -1,20 +1,22 @@
 package org.minigame.score;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.minigame.configuration.Actions;
 import org.minigame.configuration.HttpStatus;
+import org.minigame.configuration.MiniGameException;
 import org.minigame.session.Session;
 import org.minigame.session.SessionService;
-import org.mockito.*;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.io.IOException;
 import java.time.Clock;
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -41,7 +43,7 @@ public class ScoreControllerTest {
         when(sessionService.isValid("UICSNDK")).thenReturn(true);
         when(sessionService.get("UICSNDK")).thenReturn(session);
         doNothing().when(scoreService).save(any(Score.class));
-        var response = scoreController.execute(Actions.POST_SCORE,"1000", "2", queryParam);
+        var response = scoreController.registerScore("1000", "2", queryParam);
 
         //then
         verify(scoreService, times(1)).save(any(Score.class));
@@ -58,10 +60,11 @@ public class ScoreControllerTest {
         queryParam.put("sessionkey", "UICSNDK");
 
         //when
-        var response = scoreController.execute(Actions.POST_SCORE, "1000", null, queryParam);
+        var thrown = Assertions.assertThrows(MiniGameException.class,
+                () -> scoreController.registerScore("1000", null, queryParam));
 
         //then
-        assertEquals(HttpStatus.BAD_REQUEST, response.getHttpStatus());
+        assertEquals(HttpStatus.BAD_REQUEST, thrown.getHttpStatus());
     }
 
     @Test
@@ -72,10 +75,11 @@ public class ScoreControllerTest {
         queryParam.put("sessionkey", "UICSNDK");
 
         //when
-        var response = scoreController.execute(Actions.POST_SCORE, "", "2", queryParam);
+        var thrown = Assertions.assertThrows(MiniGameException.class,
+                () -> scoreController.registerScore("", "2", queryParam));
 
         //then
-        assertEquals(HttpStatus.BAD_REQUEST, response.getHttpStatus());
+        assertEquals(HttpStatus.BAD_REQUEST, thrown.getHttpStatus());
     }
 
     @Test
@@ -86,10 +90,11 @@ public class ScoreControllerTest {
         queryParam.put("sessionkey", "UICSNDK");
 
         //when
-        var response = scoreController.execute(Actions.POST_SCORE,"ABCD", "2", queryParam);
+        var thrown = Assertions.assertThrows(MiniGameException.class,
+                () -> scoreController.registerScore("ABCD", "2", queryParam));
 
         //then
-        assertEquals(HttpStatus.BAD_REQUEST, response.getHttpStatus());
+        assertEquals(HttpStatus.BAD_REQUEST, thrown.getHttpStatus());
     }
 
     @Test
@@ -100,10 +105,11 @@ public class ScoreControllerTest {
         queryParam.put("sessionkey", "");
 
         //when
-        var response = scoreController.execute(Actions.POST_SCORE,"1000", "2", queryParam);
+        var thrown = Assertions.assertThrows(MiniGameException.class,
+                () -> scoreController.registerScore("1000", "2", queryParam));
 
         //then
-        assertEquals(HttpStatus.BAD_REQUEST, response.getHttpStatus());
+        assertEquals(HttpStatus.BAD_REQUEST, thrown.getHttpStatus());
     }
 
     @Test
@@ -116,7 +122,7 @@ public class ScoreControllerTest {
         when(sessionService.isValid("UICSNDK")).thenReturn(false);
 
         //when
-        var response = scoreController.execute(Actions.POST_SCORE,"1000", "2", queryParam);
+        var response = scoreController.registerScore("1000", "2", queryParam);
 
         //then
         assertEquals(HttpStatus.UNAUTHORIZED, response.getHttpStatus());
@@ -128,7 +134,7 @@ public class ScoreControllerTest {
         when(scoreService.getHighestScores(anyInt())).thenReturn(anyString());
 
         //when
-        var response = scoreController.execute(Actions.GET_HIGH_SCORE_LIST,null, "2", null);
+        var response = scoreController.getHighScoreList( "2", null);
 
         //then
         assertEquals(HttpStatus.OK, response.getHttpStatus());

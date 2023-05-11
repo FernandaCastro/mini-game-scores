@@ -4,31 +4,20 @@ import org.minigame.configuration.*;
 
 import java.util.Map;
 
-public class SessionController implements Controller {
+public class SessionController {
 
-    private final HttpHelper httpHelper;
     private final SessionService sessionService;
 
-    public SessionController(HttpHelper httpHelper, SessionService sessionService) {
-        this.httpHelper = httpHelper;
+    public SessionController(SessionService sessionService) {
         this.sessionService = sessionService;
     }
 
-    protected MiniGameResponse login(int userId) {
+    public MiniGameResponse login(String pathVar, Map<String, String> queryParam) {
 
+        int userId = getUserId(pathVar);
         Session session = sessionService.registerSession(userId);
         return new MiniGameResponse(HttpStatus.OK, session.getSessionKey());
 
-    }
-
-    @Override
-    public MiniGameResponse execute(String action, String body, String pathVar, Map<String, String> queryParam) {
-        try {
-            int userId = getUserId(pathVar);
-            return login(userId);
-        }catch(MiniGameException e){
-            return new MiniGameResponse(e.getHttpStatus(), e.getMessage());
-        }
     }
 
     private int getUserId(String pathVar){

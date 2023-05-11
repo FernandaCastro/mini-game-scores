@@ -6,21 +6,22 @@ import org.minigame.session.SessionService;
 
 import java.util.Map;
 
-public class ScoreController implements Controller {
+public class ScoreController {
 
-    private final HttpHelper httpHelper;
     private final SessionService sessionService;
     private final ScoreService scoreService;
 
     private final String SESSION_KEY = "sessionkey";
 
-    public ScoreController(HttpHelper httpHelper, SessionService sessionService, ScoreService scoreService) {
-        this.httpHelper = httpHelper;
+    public ScoreController(SessionService sessionService, ScoreService scoreService) {
         this.sessionService = sessionService;
         this.scoreService = scoreService;
     }
 
-    protected MiniGameResponse registerScore(int levelId, int score, String sessionKey) {
+    public MiniGameResponse registerScore(String body, String pathVar, Map<String, String> queryParam) {
+        int levelId = getLevelId(pathVar);
+        int score = getScore(body);
+        String sessionKey = getSessionKey(queryParam);
 
         if (sessionService.isValid(sessionKey)) {
 
@@ -32,36 +33,15 @@ public class ScoreController implements Controller {
         } else {
             return new MiniGameResponse(HttpStatus.UNAUTHORIZED, "Invalid session. Please log in again.");
         }
-
     }
 
-    protected MiniGameResponse getHighScoreList(int levelId) {
+    public MiniGameResponse getHighScoreList(String pathVar, Map<String, String> queryParam) {
+
+        int levelId = getLevelId(pathVar);
 
         String scores = scoreService.getHighestScores(levelId);
         return new MiniGameResponse(HttpStatus.OK, scores);
 
-    }
-
-    @Override
-    public MiniGameResponse execute(String action, String body, String pathVar, Map<String, String> queryParam) {
-        try {
-            int levelId = getLevelId(pathVar);
-
-            switch (action) {
-
-                case Actions.POST_SCORE:
-                    int score = getScore(body);
-                    String sessionKey = getSessionKey(queryParam);
-                    return registerScore(levelId, score, sessionKey);
-
-                case Actions.GET_HIGH_SCORE_LIST:
-                    return getHighScoreList(levelId);
-                default:
-                    return new MiniGameResponse(HttpStatus.NOT_FOUND, "Action not found");
-            }
-        }catch(MiniGameException e){
-            return new MiniGameResponse(e.getHttpStatus(), e.getMessage());
-        }
     }
 
     private int getLevelId(String pathVar){
