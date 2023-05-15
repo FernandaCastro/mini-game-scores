@@ -2,23 +2,18 @@ package org.minigame.configuration;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import org.minigame.score.ScoreController;
-import org.minigame.session.SessionController;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class HttpDispatcherHandler implements HttpHandler {
 
-    private static Logger log = Logger.getLogger(HttpDispatcherHandler.class.getName());
+    private static final Logger log = Logger.getLogger(HttpDispatcherHandler.class.getName());
 
     private final RootContext rootContext;
     private final HttpHelper httpHelper;
@@ -28,7 +23,7 @@ public class HttpDispatcherHandler implements HttpHandler {
         this.httpHelper = httpHelper;
     }
 
-    private Map<Pattern, String> uriContext = Map.ofEntries(
+    private final Map<Pattern, String> uriContext = Map.ofEntries(
             Map.entry(Pattern.compile("^/(?<userId>\\d*)/login"), "org.minigame.session.SessionController::login"),
             Map.entry(Pattern.compile("^/(?<levelId>\\d*)/score"), "org.minigame.score.ScoreController::registerScore"),
             Map.entry(Pattern.compile("^/(?<levelId>\\d*)/highscorelist"), "org.minigame.score.ScoreController::getHighScoreList")

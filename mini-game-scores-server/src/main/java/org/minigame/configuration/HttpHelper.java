@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 
 public class HttpHelper {
 
-    private static Logger log = Logger.getLogger(HttpHelper.class.getName());
+    private static final Logger log = Logger.getLogger(HttpHelper.class.getName());
 
     private final String REGEX_URI = "/([0-9]+)/([a-zA-Z]+)";
     public final Pattern PATTERN_URI = Pattern.compile(REGEX_URI);
