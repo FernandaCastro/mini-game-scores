@@ -44,39 +44,42 @@ public class HttpDispatcherHandlerTest {
     HttpDispatcherHandler httpDispatcherHandler;
 
     @Test
-    public void givenGETLogin_whenHandle_shouldRouteToUserController() throws IOException, URISyntaxException {
-        InputStream requestBody = new ByteArrayInputStream("".getBytes());
+    public void givenLogin_whenHandle_shouldRouteSuccessfully() throws URISyntaxException {
         Headers headers = new Headers();
+        OutputStream responseBody = new ByteArrayOutputStream();
+        var response = new MiniGameResponse(HttpStatus.OK, "");
 
         when(exchange.getRequestURI()).thenReturn(new URI("http://localhost:8081/4711/login"));
         when(exchange.getRequestMethod()).thenReturn("GET");
-        when(exchange.getRequestBody()).thenReturn(requestBody);
+        when(exchange.getResponseHeaders()).thenReturn(headers);
+        when(exchange.getResponseBody()).thenReturn(responseBody);
         when(rootContext.get(SessionController.class)).thenReturn(sessionController);
+        when(sessionController.login("4711", null)).thenReturn(response);
 
         httpDispatcherHandler.handle(exchange);
 
-        verify(sessionController, times(1)).execute(Actions.GET_LOGIN, exchange, "", "4711", null);
+        verify(sessionController, times(1)).login("4711", null);
     }
 
     @Test
-    public void givenNoUserId_whenHandle_shouldReturnBadRequest() throws IOException, URISyntaxException {
+    public void givenLoginWithNoUserId_whenHandle_shouldRouteSuccessfully() throws URISyntaxException {
         //given
         Headers headers = new Headers();
         OutputStream responseBody = new ByteArrayOutputStream();
-
+        var response = new MiniGameResponse(HttpStatus.BAD_REQUEST, "");
 
         when(exchange.getRequestURI()).thenReturn(new URI("http://localhost:8081//login"));
+        when(exchange.getRequestMethod()).thenReturn("GET");
         when(exchange.getResponseHeaders()).thenReturn(headers);
         when(exchange.getResponseBody()).thenReturn(responseBody);
+        when(rootContext.get(SessionController.class)).thenReturn(sessionController);
+        when(sessionController.login(null, null)).thenReturn(response);
 
         //when
         httpDispatcherHandler.handle(exchange);
 
         //then
-        Mockito.verify(exchange).sendResponseHeaders(httpStatusCodeCaptor.capture(), anyLong());
-        int httpStatusCode = httpStatusCodeCaptor.getValue();
-
-        assertEquals(HttpStatus.BAD_REQUEST.getStatusCode(), httpStatusCode);
+        verify(sessionController, times(1)).login(null, null);
     }
 
     @Test
@@ -85,7 +88,6 @@ public class HttpDispatcherHandlerTest {
         Headers headers = new Headers();
         OutputStream responseBody = new ByteArrayOutputStream();
         when(exchange.getRequestURI()).thenReturn(new URI("http://localhost:8081/4711/logout"));
-        when(exchange.getRequestMethod()).thenReturn("GET");
         when(exchange.getResponseHeaders()).thenReturn(headers);
         when(exchange.getResponseBody()).thenReturn(responseBody);
 
@@ -100,73 +102,89 @@ public class HttpDispatcherHandlerTest {
     }
 
     @Test
-    public void givenPOSTScore_whenHandle_shouldRouteToScoreController() throws URISyntaxException {
+    public void givenPOSTScore_whenHandle_shouldRouteSuccessfully() throws URISyntaxException {
         InputStream requestBody = new ByteArrayInputStream("1000".getBytes());
         Headers headers = new Headers();
+        OutputStream responseBody = new ByteArrayOutputStream();
         Map<String, String> queryParam = new HashMap<>();
         queryParam.put("sessionkey", "UICSNDK");
+        var response = new MiniGameResponse(HttpStatus.OK, "");
 
         when(exchange.getRequestURI()).thenReturn(new URI("http://localhost:8081/1/score?sessionkey=UICSNDK"));
         when(exchange.getRequestMethod()).thenReturn("POST");
         when(exchange.getRequestBody()).thenReturn(requestBody);
+        when(exchange.getResponseHeaders()).thenReturn(headers);
+        when(exchange.getResponseBody()).thenReturn(responseBody);
         when(rootContext.get(ScoreController.class)).thenReturn(scoreController);
+        when(scoreController.registerScore("1000", "1", queryParam)).thenReturn(response);
 
         httpDispatcherHandler.handle(exchange);
 
-        verify(scoreController, times(1)).execute(Actions.POST_SCORE, exchange, "1000", "1", queryParam);
+        verify(scoreController, times(1)).registerScore("1000", "1", queryParam);
     }
 
     @Test
-    public void givenGETHighscorelist_whenHandle_shouldRouteToScoreController() throws URISyntaxException {
+    public void givenGETHighscorelist_whenHandle_shouldRouteSuccessfully() throws URISyntaxException {
         InputStream requestBody = new ByteArrayInputStream("".getBytes());
         Headers headers = new Headers();
+        OutputStream responseBody = new ByteArrayOutputStream();
+
+        var response = new MiniGameResponse(HttpStatus.OK, "");
+        when(scoreController.getHighScoreList("1", null)).thenReturn(response);
 
         when(exchange.getRequestURI()).thenReturn(new URI("http://localhost:8081/1/highscorelist"));
         when(exchange.getRequestMethod()).thenReturn("GET");
-        when(exchange.getRequestBody()).thenReturn(requestBody);
+        when(exchange.getResponseHeaders()).thenReturn(headers);
+        when(exchange.getResponseBody()).thenReturn(responseBody);
         when(rootContext.get(ScoreController.class)).thenReturn(scoreController);
 
         httpDispatcherHandler.handle(exchange);
 
-        verify(scoreController, times(1)).execute(Actions.GET_HIGH_SCORE_LIST, exchange, "", "1", null);
+        verify(scoreController, times(1)).getHighScoreList("1", null);
     }
 
     @Test
-    public void givenPOSTScoreAndBadLevelId_whenHandle_shouldReturnBadRequest() throws URISyntaxException, IOException {
-        //InputStream requestBody = new ByteArrayInputStream("1000".getBytes());
+    public void givenPOSTScoreAndBadLevelId_whenHandle_shouldReturnBadRequest() throws URISyntaxException {
+        InputStream requestBody = new ByteArrayInputStream("".getBytes());
         Headers headers = new Headers();
         Map<String, String> queryParam = new HashMap<>();
         queryParam.put("sessionkey", "UICSNDK");
         OutputStream responseBody = new ByteArrayOutputStream();
+        var response = new MiniGameResponse(HttpStatus.BAD_REQUEST, "");
 
         when(exchange.getRequestURI()).thenReturn(new URI("http://localhost:8081//score?sessionkey=UICSNDK"));
-        //when(exchange.getRequestMethod()).thenReturn("POST");
-        //when(exchange.getRequestBody()).thenReturn(requestBody);
+        when(exchange.getRequestMethod()).thenReturn("POST");
+        when(exchange.getRequestBody()).thenReturn(requestBody);
         when(exchange.getResponseHeaders()).thenReturn(headers);
         when(exchange.getResponseBody()).thenReturn(responseBody);
+        when(rootContext.get(ScoreController.class)).thenReturn(scoreController);
+        when(scoreController.registerScore("", null, queryParam)).thenReturn(response);
 
         httpDispatcherHandler.handle(exchange);
 
         //then
-        Mockito.verify(exchange).sendResponseHeaders(httpStatusCodeCaptor.capture(), anyLong());
-        int httpStatusCode = httpStatusCodeCaptor.getValue();
-
-        assertEquals(HttpStatus.BAD_REQUEST.getStatusCode(), httpStatusCode);
+        verify(scoreController, times(1)).registerScore("", null, queryParam);
     }
 
     @Test
-    public void givenPOSTScoreAndBadQueryParam_whenHandle_shouldReturnBadRequest() throws URISyntaxException, IOException {
+    public void givenPOSTScoreAndBadQueryParam_whenHandle_shouldReturnBadRequest() throws URISyntaxException {
         InputStream requestBody = new ByteArrayInputStream("1000".getBytes());
+        Headers headers = new Headers();
+        OutputStream responseBody = new ByteArrayOutputStream();
+        var response = new MiniGameResponse(HttpStatus.BAD_REQUEST, "");
 
         when(exchange.getRequestURI()).thenReturn(new URI("http://localhost:8081/1/score?sessionkey="));
         when(exchange.getRequestMethod()).thenReturn("POST");
         when(exchange.getRequestBody()).thenReturn(requestBody);
+        when(exchange.getResponseHeaders()).thenReturn(headers);
+        when(exchange.getResponseBody()).thenReturn(responseBody);
         when(rootContext.get(ScoreController.class)).thenReturn(scoreController);
+        when(scoreController.registerScore("1000", "1", null)).thenReturn(response);
 
         httpDispatcherHandler.handle(exchange);
 
         //then
-        verify(scoreController, times(1)).execute(Actions.POST_SCORE, exchange, "1000", "1", null);
+        verify(scoreController, times(1)).registerScore("1000", "1", null);
     }
 
 }

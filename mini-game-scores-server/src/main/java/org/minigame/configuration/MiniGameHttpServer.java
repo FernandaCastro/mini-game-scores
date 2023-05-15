@@ -27,7 +27,7 @@ public class MiniGameHttpServer {
             httpServer.createContext("/", new HttpDispatcherHandler(rootContext, (HttpHelper) rootContext.get(HttpHelper.class)));
             httpServer.setExecutor((ThreadPoolExecutor)Executors.newFixedThreadPool(threadPool));
             httpServer.start();
-            log.log(Level.INFO, "HttpServer started on port: {0} - threadPool: {1} ", List.of(port, threadPool).toArray());
+            log.log(Level.INFO, "HttpServer started on port: {0} - threadPool: {1} ", new Integer[]{port, threadPool});
         } catch (IOException e) {
             e.printStackTrace();
         }

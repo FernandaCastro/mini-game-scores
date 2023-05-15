@@ -1,10 +1,11 @@
 package org.minigame.score;
 
-import org.minigame.configuration.Service;
-
+import java.util.NavigableSet;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
-public class ScoreService implements Service {
+public class ScoreService {
 
     private final ScoreRepository scoreRepository;
 
@@ -23,16 +24,13 @@ public class ScoreService implements Service {
             return "";
         }
 
-        //TODO: find better alternative to limit() and toSet()/distinct() due to possibly low performance
-        var filtered = scores.parallelStream()
+        return scores.parallelStream()
                 .limit(15)
-                .collect(Collectors.toSet());
-
-        return filtered.parallelStream()
-                .sorted()
                 .map(s -> s.getUserId() + "="+ s.getScore())
                 .collect(Collectors.joining(","));
     }
 
-    //TODO: Implement a Purge to clean ScoreRepository
+    public int purge(){
+        return scoreRepository.purge();
+    }
 }

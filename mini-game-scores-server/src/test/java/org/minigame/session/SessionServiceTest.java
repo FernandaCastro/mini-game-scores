@@ -8,8 +8,10 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Clock;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalField;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -30,7 +32,7 @@ public class SessionServiceTest {
     @Test
     public void givenUserIdWithNoExistingSession_whenRegisterSession_shouldCreateNewSessionTest(){
         //given
-        when(sessionRepository.get(4711)).thenReturn(null);
+        when(sessionRepository.getValidSession(4711, clock, Duration.ofMinutes(10).toMillis())).thenReturn(null);
         when(clock.instant()).thenReturn(Instant.now());
 
         //when
@@ -43,11 +45,12 @@ public class SessionServiceTest {
     @Test
     public void givenUserIdWithValidExistingSession_whenRegisterSession_shouldReturnExistingSessionTest(){
         //given
-        var existingSession = new Session(4711, Clock.systemUTC().millis());
-        when(sessionRepository.get(4711)).thenReturn(existingSession);
-        when(clock.instant()).thenReturn(Instant.now());
+        var now = clock.instant().now();
+        var existingSession = new Session(4711, now.toEpochMilli());
 
         //when
+        when(sessionRepository.getValidSession(4711, clock, Duration.ofMinutes(10).toMillis())).thenReturn(existingSession);
+        // when(clock.instant()).thenReturn(now);
         var returnedSession = sessionService.registerSession(4711);
 
         //then
@@ -57,15 +60,15 @@ public class SessionServiceTest {
     @Test
     public void givenExpiredSession_whenRegisterSession_shouldReturnExistingSessionTest(){
         //given
-        long createdAt = Instant.now().minus(15, ChronoUnit.MINUTES).toEpochMilli();
+        var now = clock.instant().now();
+        long createdAt = now.minus(15, ChronoUnit.MINUTES).toEpochMilli();
         var existingSession = new Session(4711, createdAt);
 
-        when(sessionRepository.get(4711)).thenReturn(existingSession);
-        when(clock.instant()).thenReturn(Instant.now());
-        doNothing().when(sessionRepository).save(any(Session.class));
-        doNothing().when(sessionRepository).save(anyInt(), any(Session.class));
-
         //when
+        when(sessionRepository.getValidSession(4711, clock, Duration.ofMinutes(10).toMillis())).thenReturn(null);
+        when(clock.instant()).thenReturn(now);
+        doNothing().when(sessionRepository).save(any(Session.class));
+        //doNothing().when(sessionRepository).save(anyInt(), any(Session.class));
         var returnedSession = sessionService.registerSession(4711);
 
         //then

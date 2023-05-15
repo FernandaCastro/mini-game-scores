@@ -44,7 +44,7 @@ public class SessionServiceIntegrationTest {
         int userId = 1234;
         var validSession = new Session(userId, Clock.systemUTC().millis());
         sessionRepository.save(validSession);
-        sessionRepository.save(validSession.getUserId(), validSession);
+        //sessionRepository.save(validSession.getUserId(), validSession);
 
         //when
         var returnedSession = sessionService.registerSession(userId);
@@ -62,7 +62,7 @@ public class SessionServiceIntegrationTest {
         long expiredTime = Instant.now().minus(20, ChronoUnit.MINUTES).toEpochMilli();
         var invalidSession = new Session(userId, expiredTime);
         sessionRepository.save(invalidSession);
-        sessionRepository.save(invalidSession.getUserId(), invalidSession);
+        //sessionRepository.save(invalidSession.getUserId(), invalidSession);
 
         //when
         var returnedSession = sessionService.registerSession(userId);

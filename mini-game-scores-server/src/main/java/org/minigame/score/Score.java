@@ -33,7 +33,7 @@ public class Score implements Comparable<Score>{
         if (this == o) return true;
         if (!(o instanceof Score)) return false;
         Score score1 = (Score) o;
-        return getLevelId() == score1.getLevelId() && getUserId() == score1.getUserId();
+        return this.getLevelId() == score1.getLevelId() && this.getUserId() == score1.getUserId();
     }
 
     @Override
@@ -44,6 +44,14 @@ public class Score implements Comparable<Score>{
 
     @Override
     public int compareTo(Score o) {
-        return Integer.compare(o.getScore(), getScore());
+        if (this.getLevelId() == o.getLevelId() && this.getUserId() == o.getUserId()){
+            return 0;
+        }else if (o.getScore() == this.getScore()) {
+            //UserId in naturalOrder
+            return Integer.compare(this.getUserId(), o.getUserId());
+        }else{
+            //Score in reversedOrder
+            return Integer.compare(o.getScore(), this.getScore());
+        }
     }
 }
