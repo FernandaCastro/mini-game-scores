@@ -11,22 +11,29 @@ import org.minigame.session.SessionController;
 import org.minigame.session.SessionRepository;
 import org.minigame.session.SessionService;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Clock;
 import java.time.Duration;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Timer;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 public class MiniGameScoresApplication {
 
     static {
-        System.setProperty("java.util.logging.config.file", MiniGameScoresApplication.class.getClassLoader().getResource("application.properties").getFile());
+        try {
+            LogManager.getLogManager().readConfiguration(MiniGameScoresApplication.class.getClassLoader().getResourceAsStream("application.properties"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    private static Logger log = Logger.getLogger(MiniGameScoresApplication.class.getName());
+    private static final Logger log = Logger.getLogger(MiniGameScoresApplication.class.getName());
 
     public static void main(String[] args) throws IOException {
 
