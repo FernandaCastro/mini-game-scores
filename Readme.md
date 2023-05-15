@@ -2,8 +2,10 @@
 
 Coded and tested using ```JDK 11```
 
-Mini Game Scores is an HTTP-based mini game back-end in Java which registers game scores for different users and
+Mini Game Scores is an HTTP-based mini game back-end in Java Core which registers game scores for different users and
 levels, with the capability to return a list ranking the 15 highest scores of a level.
+
+No framework was used in this project. 
 
 The ranking per level considers only the latest score of the user. 
 
@@ -53,7 +55,7 @@ It accepts the following HTTP Requests:
 
 
 ###How to build the project
-The following instructions will perform **38 tests cases** related the **mini-game-scores-server** module,
+The following instructions will perform **tests cases** related the **mini-game-scores-server** module,
 and will also generate 2 executable JARs:
 
 - **mini-game-scores-server** : mini-game-scores-server-1.0-jar-with-dependencies.jar
@@ -66,17 +68,11 @@ and will also generate 2 executable JARs:
 1. Navigate to mini-game-scores-server\target
 2. Run ```chmod 775 mini-game-scores-server-1.0-jar-with-dependencies.jar```
 3. Run ```java -jar mini-game-scores-server-1.0-jar-with-dependencies.jar [<port> <threadPool>]```
-   1. If no parameter is informed it will assume **port:8081** and **threadPool:100**
-   2. The property logLevel can also be informed. The default is **INFO**:
-      1. ```java -DlogLevel=FINE -jar mini-game-scores-server-1.0-jar-with-dependencies.jar```
+   1. If no parameter is informed then it assumes **port:8081** and **threadPool:100**
+
 
 ###Points of Improvements and Considerations
-- **Define and implement a __purge process__ for the scores stored in memory.** 
-- Refactor the HTTP Route Mapping process, making it more abstract and separate it from the HTTP Dispatch process.
-- Improve the process of collecting the 15 highest scores. 
-  - Ideally no duplicate userId should be stored when adding a score. 
-  - This solution is aware of the inconsistency among equals() and compareTo() for the chosen data structure: "Note: this class has a natural ordering that is inconsistent with equals." 
-  - So a second step was needed to skip/remove duplicate userId in the highscorelist
+**Refactor uriLockupMatching process: make it be more dynamic**
    
 ###Testing the Concurrency
 A small application was developed to test concurrency **[ mini-game-scores-concurrency-test ]**. 
@@ -94,15 +90,16 @@ So that a simple analysis of the responses for the concurrent requests is made a
    1. If no JAR is available is this folder, then generate it by running ```mvn clean install```
 2. Run ```chmod 775 mini-game-scores-concurrency-test-1.0-jar-with-dependencies.jar```
 3. Run ```java [properties] -jar mini-game-scores-concurrency-test-1.0-jar-with-dependencies.jar```
+   1. if no properties is passed, then default values are assumed.
    
-   Property | Default | Description
-   ---| ---| ---
-   hostname | localhost | Mini Game Server hostname
-   port | 8081 | Mini Game server port 
-   login |1000 | Number of threads sending ``GET /<userid>/login``requests 
-   score | 1000 | Number of threads sending ``POST /<levelid>/score?sessionkey=<sessionkey>``requests 
-   ranking | 500 | Number of threads sending ``GET /<levelid>/highscorelist``requests
-   logLevel | INFO | Defines the granularity of the log messages: OFF, SEVERE, WARNING, INFO, CONFIG, FINE, FINER, FINEST, ALL 
+      Property | Default | Description
+      ---| ---| ---
+      hostname | localhost | Mini Game Server hostname
+      port | 8081 | Mini Game server port 
+      login |1000 | Number of threads sending ``GET /<userid>/login``requests 
+      score | 1000 | Number of threads sending ``POST /<levelid>/score?sessionkey=<sessionkey>``requests 
+      ranking | 500 | Number of threads sending ``GET /<levelid>/highscorelist``requests
+      logLevel | INFO | Defines the granularity of the log messages: OFF, SEVERE, WARNING, INFO, CONFIG, FINE, FINER, FINEST, ALL 
 
 Example:
 
@@ -117,9 +114,6 @@ Example of output:
 [2022-07-04 15:42:39 555] [INFO   ] Processing time(ms): 8.701 
 [2022-07-04 15:42:39 558] [INFO   ] NOT OK[200] Responses: 0 
 ```
-
-###Diagram of one of the scenarios
-![img_2.png](img_2.png)
 
 
 
